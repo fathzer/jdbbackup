@@ -9,8 +9,8 @@ public class Test {
 //		DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 //		final File destFile = new File("backup-" + database + "-" + params.getDbHost() + "-(" + dateFormat.format(new Date()) + ").sql");
 		
-		Parameters params = new Parameters();
-		params.setDbPwd("gti9220");
+		DBParameters params = new DBParameters();
+		params.setPwd("gti9220");
 		try {
 			File file = new DBSaver().save(params, "Photos");
 			System.out.println("done! -> "+file);

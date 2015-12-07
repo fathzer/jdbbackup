@@ -11,14 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DBSaver {
-	public File save(Parameters params, String database) throws IOException {
+	public File save(DBParameters params, String database) throws IOException {
 		List<String> commands = new ArrayList<String>();
 		commands.add("mysqldump");
-		commands.add("--host="+params.getDbHost());
-		commands.add("--port="+params.getDbPort());
-		commands.add("--user="+params.getDbUser());
-		if (!params.getDbPwd().isEmpty()) {
-			commands.add("--password="+params.getDbPwd());
+		commands.add("--host="+params.getHost());
+		commands.add("--port="+params.getPort());
+		commands.add("--user="+params.getUser());
+		if (!params.getPwd().isEmpty()) {
+			commands.add("--password="+params.getPwd());
 		}
 		commands.add("--add-drop-database");
 		commands.add(database);
