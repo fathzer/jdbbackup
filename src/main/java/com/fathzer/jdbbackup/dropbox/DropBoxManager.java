@@ -1,6 +1,7 @@
 package com.fathzer.jdbbackup.dropbox;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Authenticator;
@@ -50,11 +51,11 @@ public class DropBoxManager implements FileManager {
 	}
 	
 	@Override
-	public void send() throws IOException {
+	public void send(File file) throws IOException {
 		DbxClient client = new DbxClient(config, token);
 		try {
 			// TODO Auto-generated
-			System.out.println("Linked account: " + client.getAccountInfo().displayName);
+			System.out.println("Should send file: "+file+" to " + client.getAccountInfo().displayName+" path="+path);
 		} catch (DbxException e) {
 			throw new IOException(e);
 		}
