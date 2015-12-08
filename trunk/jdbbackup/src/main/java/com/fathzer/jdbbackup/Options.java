@@ -61,4 +61,36 @@ public class Options {
 	public String getFormat() {
 		return format;
 	}
+
+	public void setDbName(String dbName) {
+		this.dbName = dbName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public void setDbHost(String dbHost) {
+		this.dbHost = dbHost;
+	}
+
+	public void setDbPort(int dbPort) {
+		this.dbPort = dbPort;
+	}
+
+	public void setDbUser(String dbUser) {
+		this.dbUser = dbUser;
+	}
+
+	public void setDbPwd(String dbPwd) {
+		this.dbPwd = dbPwd;
+	}
+
+	public void setTarget(Target target) {
+		this.target = target;
+	}
+
+	public void setFormat(String format) {
+		this.format = format;
+	}
 }

@@ -1,11 +1,15 @@
 package com.fathzer.jdbbackup;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.spi.OptionHandler;
+
+import com.fathzer.jdbbackup.dropbox.DropBoxManager;
 
 public class JDbBackup {
 	private CmdLineParser parser;
@@ -28,10 +32,13 @@ public class JDbBackup {
 //            System.err.println();
 // print option sample. This is useful some time
 //            System.err.println("Example: java "+JDbBackup.class.getName()+parser.printExample(OptionHandlerFilter.PUBLIC)+" "+getArguments(parser));
+        } catch (IOException e) {
+        	//TODO
+        	e.printStackTrace();
         }
 	}
 
-	private void doIt(String[] args) throws CmdLineException {
+	private void doIt(String[] args) throws CmdLineException, IOException {
 		// parse the arguments.
 		parser.parseArgument(args);
 		String fName = options.getFileName();
@@ -43,6 +50,19 @@ public class JDbBackup {
 			}
 		}
 		System.out.println (fName);
+		FileManager manager = null;
+		File destFile = null;
+		if (Options.Target.DROPBOX.equals(options.getTarget())) {
+			manager = new DropBoxManager();
+			manager.parseFileName(fName);
+		} else {
+			throw new UnsupportedOperationException("Not yet implemented");
+		}
+		//TODO catch IOException in order to separate problems during data extract and during saving the extraction
+		destFile = new DBSaver().save(options, destFile);
+		if (destFile!=null) {
+			manager.send(destFile);
+		}
 	}
 	
 	private static CharSequence getArguments(CmdLineParser parser) {
