@@ -1,6 +1,7 @@
 package com.fathzer.jdbbackup.dropbox;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Authenticator;
 import java.net.InetSocketAddress;
@@ -10,6 +11,8 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.kohsuke.args4j.CmdLineException;
+
 import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxAuthFinish;
 import com.dropbox.core.DbxClient;
@@ -17,18 +20,20 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.DbxWebAuthNoRedirect;
 import com.dropbox.core.http.StandardHttpRequestor;
+import com.fathzer.jdbbackup.FileManager;
 import com.fathzer.jdbbackup.ProxyParameters;
 
-public class DropBoxArchiver {
+public class DropBoxManager implements FileManager {
 	private static final String NAME = "jDbBackup";
 	private DbxRequestConfig config;
 	private String token;
+	private String path;
 	
-	public DropBoxArchiver() {
+	public DropBoxManager() {
 		this.config = new DbxRequestConfig(NAME, Locale.getDefault().toString());
 	}
 
-	public DropBoxArchiver(final ProxyParameters params) {
+	public DropBoxManager(final ProxyParameters params) {
 		Proxy proxy = Proxy.NO_PROXY;
 		if (params.getAddress()!=null) {
 	        proxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(params.getAddress(),params.getPort()));
@@ -44,20 +49,21 @@ public class DropBoxArchiver {
 		this.config = new DbxRequestConfig(NAME, Locale.getDefault().toString(), new StandardHttpRequestor(proxy));
 	}
 	
-	public void setToken(String token) {
-		this.token = token;
-	}
-	
-	public void save() throws DbxException {
-		// TODO Auto-generated
+	@Override
+	public void send() throws IOException {
 		DbxClient client = new DbxClient(config, token);
-		System.out.println("Linked account: " + client.getAccountInfo().displayName);
+		try {
+			// TODO Auto-generated
+			System.out.println("Linked account: " + client.getAccountInfo().displayName);
+		} catch (DbxException e) {
+			throw new IOException(e);
+		}
 	}
 
 	public static void main(String[] args) {
 		try {
 			ProxyParameters params = new ProxyParameters("138.21.89.192",3128,"a193041","jma12015"); 
-			DropBoxArchiver archiver = new DropBoxArchiver(params);
+			DropBoxManager archiver = new DropBoxManager(params);
 			archiver.getToken();
 //			archiver.setToken("aHAabZt7_ZAAAAAAAAAB3q16ll-SpQfSZ6k_W6SG_cvDNdiO6VPNxj1Aaw7z9rpN");
 		} catch (Exception e) {
@@ -66,7 +72,7 @@ public class DropBoxArchiver {
 		}
 	}
 	
-	public void getToken() {
+	private void getToken() {
         DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(config, getDbxAppInfo());
         String authorizeUrl = webAuth.start();
         System.out.println("1. Go to: " + authorizeUrl);
@@ -88,12 +94,25 @@ public class DropBoxArchiver {
 	private static DbxAppInfo getDbxAppInfo() {
 		// For obvious reasons, your application keys and secret are not released with the source files.
 		// You should edit keys.properties in order to run this demo
-		ResourceBundle bundle = ResourceBundle.getBundle(DropBoxArchiver.class.getPackage().getName()+".keys"); //$NON-NLS-1$
+		ResourceBundle bundle = ResourceBundle.getBundle(DropBoxManager.class.getPackage().getName()+".keys"); //$NON-NLS-1$
 		String key = bundle.getString("appKey");
 		String secret = bundle.getString("appSecret");
 		if (key.length()==0 || secret.length()==0) {
 			throw new MissingResourceException("App key and secret not provided","","");
 		}
 		return new DbxAppInfo(key, secret);
+	}
+
+	@Override
+	public void parseFileName(String fileName) throws CmdLineException {
+		int index = fileName.indexOf('/');
+		if (index<=0) {
+			throw new CmdLineException("Unable to locate token. "+"FileName should conform to the format access_token/path");
+		}
+		this.token = fileName.substring(0, index);
+		this.path = fileName.substring(index+1);
+		if (this.path.isEmpty()) {
+			throw new CmdLineException("Unable to locate destination path. "+"FileName should conform to the format access_token/path");
+		}
 	}
 }

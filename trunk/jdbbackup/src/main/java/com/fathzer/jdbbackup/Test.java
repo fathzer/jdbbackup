@@ -12,7 +12,7 @@ public class Test {
 		DBParameters params = new DBParameters();
 		params.setPwd("gti9220");
 		try {
-			File file = new DBSaver().save(params, "Photos");
+			File file = new DBSaver().save(params, "Photos", null);
 			System.out.println("done! -> "+file);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

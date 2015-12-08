@@ -11,21 +11,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DBSaver {
-	public File save(DBParameters params, String database) throws IOException {
-		List<String> commands = new ArrayList<String>();
-		commands.add("mysqldump");
-		commands.add("--host="+params.getHost());
-		commands.add("--port="+params.getPort());
-		commands.add("--user="+params.getUser());
-		if (!params.getPwd().isEmpty()) {
-			commands.add("--password="+params.getPwd());
-		}
-		commands.add("--add-drop-database");
-		commands.add(database);
+	public DBSaver() {
+		super();
+	}
+	
+	public File save(DBParameters params, String database, File destFile) throws IOException {
+		List<String> commands = getCommand(params, database);
 
 		ProcessBuilder pb = new ProcessBuilder(commands);
-		File destFile = File.createTempFile("mySqlDump", ".sql.gzip");
-		destFile.deleteOnExit();
+		if (destFile==null) {
+			destFile = File.createTempFile("DBDump", ".gzip");
+			destFile.deleteOnExit();
+		}
 		Process process = pb.start();
 		final InputStream in = process.getInputStream();
 		Compressor compressor = new Compressor(destFile, in);
@@ -59,4 +56,18 @@ public class DBSaver {
 			return null;
 		}
     }
+
+	protected List<String> getCommand(DBParameters params, String database) {
+		List<String> commands = new ArrayList<String>();
+		commands.add("mysqldump");
+		commands.add("--host="+params.getHost());
+		commands.add("--port="+params.getPort());
+		commands.add("--user="+params.getUser());
+		if (!params.getPwd().isEmpty()) {
+			commands.add("--password="+params.getPwd());
+		}
+		commands.add("--add-drop-database");
+		commands.add(database);
+		return commands;
+	}
 }
