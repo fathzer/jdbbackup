@@ -4,8 +4,6 @@ import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
 public class Options {
-    public enum Target { FILE, DROPBOX };
-
     @Argument(index = 0, metaVar="base", usage ="Data base name", required=true)
     private String dbName;
     
@@ -24,12 +22,9 @@ public class Options {
     @Option(name = "-pwd", metaVar="dbPassword", usage = "Data base user password")
     private String dbPwd;
 
-    @Option(name="-t", metaVar="target", usage = "Where to store the backup")
-    private Target target = Target.FILE;
+    @Option(name="-t", metaVar="target", usage = "Where to store the backup (local file, dropbox)")
+    private String target = "file";
     
-    @Option(name="-d", metaVar="dateFormat", usage = "A date format that will be add to dest file name")
-    private String format;
-
 	public String getDbName() {
 		return dbName;
 	}
@@ -54,12 +49,8 @@ public class Options {
 		return dbPwd;
 	}
 
-	public Target getTarget() {
+	public String getTarget() {
 		return target;
-	}
-
-	public String getFormat() {
-		return format;
 	}
 
 	public void setDbName(String dbName) {
@@ -86,11 +77,7 @@ public class Options {
 		this.dbPwd = dbPwd;
 	}
 
-	public void setTarget(Target target) {
+	public void setTarget(String target) {
 		this.target = target;
-	}
-
-	public void setFormat(String format) {
-		this.format = format;
 	}
 }

@@ -14,8 +14,6 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.kohsuke.args4j.CmdLineException;
-
 import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxAuthFinish;
 import com.dropbox.core.DbxClient;
@@ -26,6 +24,8 @@ import com.dropbox.core.DbxWebAuthNoRedirect;
 import com.dropbox.core.DbxWriteMode;
 import com.dropbox.core.http.StandardHttpRequestor;
 import com.fathzer.jdbbackup.FileManager;
+import com.fathzer.jdbbackup.InvalidArgument;
+import com.fathzer.jdbbackup.DefaultNameDecoder;
 import com.fathzer.jdbbackup.ProxyParameters;
 
 public class DropBoxManager implements FileManager {
@@ -109,18 +109,20 @@ public class DropBoxManager implements FileManager {
 	}
 
 	@Override
-	public void parseFileName(String fileName) throws CmdLineException {
+	public File setFileName(String fileName) throws InvalidArgument {
 		int index = fileName.indexOf('/');
 		if (index<=0) {
-			throw new CmdLineException("Unable to locate token. "+"FileName should conform to the format access_token/path");
+			throw new InvalidArgument("Unable to locate token. "+"FileName should conform to the format access_token/path");
 		}
 		this.token = fileName.substring(0, index);
 		this.path = fileName.substring(index+1);
 		if (this.path.isEmpty()) {
-			throw new CmdLineException("Unable to locate destination path. "+"FileName should conform to the format access_token/path");
+			throw new InvalidArgument("Unable to locate destination path. "+"FileName should conform to the format access_token/path");
 		}
 		if (!path.startsWith("/")) {
 			path = "/"+path;
 		}
+		path = DefaultNameDecoder.INSTANCE.decode(path);
+		return null;
 	}
 }
