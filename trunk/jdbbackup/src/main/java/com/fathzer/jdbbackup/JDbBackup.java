@@ -26,12 +26,11 @@ public class JDbBackup {
 			backup.doIt(args);
         } catch (CmdLineException e) {
             System.err.println(e.getMessage());
-            System.err.println("java "+JDbBackup.class.getName()+" [options...] "+getArguments(backup.parser));
+            // Create a new parser in order to not have currently parsed options displayed as default.
+            CmdLineParser p = new CmdLineParser(new Options());
+            System.err.println("java "+JDbBackup.class.getName()+" [options...] "+getArguments(p));
             // print the list of available options
-            backup.parser.printUsage(System.err);
-//            System.err.println();
-// print option sample. This is useful some time
-//            System.err.println("Example: java "+JDbBackup.class.getName()+parser.printExample(OptionHandlerFilter.PUBLIC)+" "+getArguments(parser));
+            p.printUsage(System.err);
         } catch (IOException e) {
         	//TODO
         	e.printStackTrace();
@@ -42,16 +41,25 @@ public class JDbBackup {
 		// parse the arguments.
 		parser.parseArgument(args);
 		String fName = options.getFileName();
-		if (options.getFormat()!=null) {
+		String format = options.getFormat();
+		if (format!=null) {
 			try {
-				fName = fName + new SimpleDateFormat(options.getFormat()).format(new Date());
+				String formatted = new SimpleDateFormat(format).format(new Date());
+				if (formatted.indexOf('/')>=0) {
+					//TODO
+				} else {
+					fName = fName + formatted;
+				}
 			} catch (IllegalArgumentException e) {
 				throw new CmdLineException(parser, "dateFormat is invalid", e);
 			}
 		}
-		System.out.println (fName);
 		FileManager manager = null;
 		File destFile = null;
+		fName = fName + ".sql"; //TODO May depends on database ?
+		if (!fName.endsWith(".gz")) {
+			fName = fName + ".gz";
+		}
 		if (Options.Target.DROPBOX.equals(options.getTarget())) {
 			manager = new DropBoxManager();
 			manager.parseFileName(fName);

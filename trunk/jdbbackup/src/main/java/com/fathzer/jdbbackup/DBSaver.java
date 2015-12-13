@@ -20,7 +20,7 @@ public class DBSaver {
 
 		ProcessBuilder pb = new ProcessBuilder(commands);
 		if (destFile==null) {
-			destFile = File.createTempFile("DBDump", ".gzip");
+			destFile = File.createTempFile("DBDump", ".gz");
 			destFile.deleteOnExit();
 		}
 		Process process = pb.start();

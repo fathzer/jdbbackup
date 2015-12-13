@@ -27,7 +27,7 @@ public class Options {
     @Option(name="-t", metaVar="target", usage = "Where to store the backup")
     private Target target = Target.FILE;
     
-    @Option(name="-f", metaVar="dateFormat", usage = "A date format that will be add to dest file name")
+    @Option(name="-d", metaVar="dateFormat", usage = "A date format that will be add to dest file name")
     private String format;
 
 	public String getDbName() {

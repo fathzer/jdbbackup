@@ -2,7 +2,9 @@ package com.fathzer.jdbbackup.dropbox;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Authenticator;
 import java.net.InetSocketAddress;
@@ -17,9 +19,11 @@ import org.kohsuke.args4j.CmdLineException;
 import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxAuthFinish;
 import com.dropbox.core.DbxClient;
+import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.DbxWebAuthNoRedirect;
+import com.dropbox.core.DbxWriteMode;
 import com.dropbox.core.http.StandardHttpRequestor;
 import com.fathzer.jdbbackup.FileManager;
 import com.fathzer.jdbbackup.ProxyParameters;
@@ -53,9 +57,9 @@ public class DropBoxManager implements FileManager {
 	@Override
 	public void send(File file) throws IOException {
 		DbxClient client = new DbxClient(config, token);
-		try {
-			// TODO Auto-generated
-			System.out.println("Should send file: "+file+" to " + client.getAccountInfo().displayName+" path="+path);
+		try (InputStream in = new FileInputStream(file)) {
+			DbxEntry.File entry = client.uploadFile(path, DbxWriteMode.force(), file.length(), in); 
+			System.out.println("Sent to Dropbox: "+entry.name+"("+entry.rev+")");
 		} catch (DbxException e) {
 			throw new IOException(e);
 		}
@@ -114,6 +118,9 @@ public class DropBoxManager implements FileManager {
 		this.path = fileName.substring(index+1);
 		if (this.path.isEmpty()) {
 			throw new CmdLineException("Unable to locate destination path. "+"FileName should conform to the format access_token/path");
+		}
+		if (!path.startsWith("/")) {
+			path = "/"+path;
 		}
 	}
 }
