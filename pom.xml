@@ -9,6 +9,10 @@
 	<artifactId>jdbbackup</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<description>A simple java library to perform db backup stored in dropbox</description>
+	<scm>
+		<url>http://svn.code.sf.net/p/jdbbackup/code/trunk/jdbbackup</url>
+		<connection>http://svn.code.sf.net/p/jdbbackup/code/trunk/jdbbackup</connection>
+	</scm>
 	<dependencies>
 		<dependency>
 			<groupId>com.dropbox.core</groupId>
