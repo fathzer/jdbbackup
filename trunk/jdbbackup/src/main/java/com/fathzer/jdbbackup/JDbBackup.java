@@ -10,14 +10,15 @@ import org.kohsuke.args4j.spi.OptionHandler;
 import com.fathzer.jdbbackup.dropbox.DropBoxManager;
 
 public class JDbBackup {
-	private CmdLineParser parser;
-	private Options options;
+	protected CmdLineParser parser;
+	protected Options options;
+	protected PathDecoder pathDecoder;
 	
 	private JDbBackup() {
 		options = new Options();
 		parser = new CmdLineParser(options);
+		pathDecoder = new DefaultPathDecoder();
 	}
-
 	
 	public static void main(String[] args) {
 		JDbBackup backup = new JDbBackup();
@@ -43,8 +44,8 @@ public class JDbBackup {
 		} catch(CmdLineException e) {
 			throw new InvalidArgument(e);
 		}
-		FileManager manager = getFileManager();
-		File destFile = manager.setFileName(options.getFileName());
+		DestinationManager manager = getFileManager();
+		File destFile = manager.setDestinationPath(options.getFileName());
 		//TODO catch IOException in order to separate problems during data extract and during saving the extraction
 		destFile = new DBSaver().save(options, destFile);
 		if (destFile!=null) {
@@ -52,11 +53,11 @@ public class JDbBackup {
 		}
 	}
 	
-	protected FileManager getFileManager() throws InvalidArgument {
+	protected DestinationManager getFileManager() throws InvalidArgument {
 		if ("dropbox".equals(options.getTarget())) {
-			return new DropBoxManager();
+			return new DropBoxManager(pathDecoder);
 		} else if ("file".equals(options.getTarget())) {
-			return new DefaultFileManager();
+			return new FileManager(pathDecoder);
 		} else {
 			throw new InvalidArgument("Unknown target: "+options.getTarget());
 		}

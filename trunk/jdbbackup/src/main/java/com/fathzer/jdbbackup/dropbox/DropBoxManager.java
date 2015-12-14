@@ -14,6 +14,8 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.kohsuke.args4j.CmdLineParser;
+
 import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxAuthFinish;
 import com.dropbox.core.DbxClient;
@@ -23,30 +25,35 @@ import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.DbxWebAuthNoRedirect;
 import com.dropbox.core.DbxWriteMode;
 import com.dropbox.core.http.StandardHttpRequestor;
-import com.fathzer.jdbbackup.FileManager;
+import com.fathzer.jdbbackup.DefaultPathDecoder;
+import com.fathzer.jdbbackup.DestinationManager;
 import com.fathzer.jdbbackup.InvalidArgument;
-import com.fathzer.jdbbackup.DefaultNameDecoder;
-import com.fathzer.jdbbackup.ProxyParameters;
+import com.fathzer.jdbbackup.PathDecoder;
+import com.fathzer.jdbbackup.ProxyOptions;
 
-public class DropBoxManager implements FileManager {
+/** A file manager that saves the backups to a dropbox account.
+ */
+public class DropBoxManager extends DestinationManager {
 	private static final String NAME = "jDbBackup";
 	private DbxRequestConfig config;
 	private String token;
 	private String path;
 	
-	public DropBoxManager() {
+	public DropBoxManager(PathDecoder pathDecoder) {
+		super(pathDecoder);
 		this.config = new DbxRequestConfig(NAME, Locale.getDefault().toString());
 	}
 
-	public DropBoxManager(final ProxyParameters params) {
+	public DropBoxManager(PathDecoder pathDecoder, final ProxyOptions options) {
+		super(pathDecoder);
 		Proxy proxy = Proxy.NO_PROXY;
-		if (params.getAddress()!=null) {
-	        proxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(params.getAddress(),params.getPort()));
-			if (params.getUser() != null) {
+		if (options.getProxyHost()!=null) {
+	        proxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(options.getProxyHost(),options.getProxyPort()));
+			if (options.getProxyUser() != null) {
 				Authenticator.setDefault(new Authenticator() {
 					@Override
 					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(params.getUser(), params.getPwd().toCharArray());
+						return new PasswordAuthentication(options.getProxyUser(), options.getProxyPwd().toCharArray());
 					}
 				});
 			}
@@ -62,18 +69,6 @@ public class DropBoxManager implements FileManager {
 			System.out.println("Sent to Dropbox: "+entry.name+"("+entry.rev+")");
 		} catch (DbxException e) {
 			throw new IOException(e);
-		}
-	}
-
-	public static void main(String[] args) {
-		try {
-			ProxyParameters params = new ProxyParameters("138.21.89.192",3128,"a193041","jma12015"); 
-			DropBoxManager archiver = new DropBoxManager(params);
-			archiver.getToken();
-//			archiver.setToken("aHAabZt7_ZAAAAAAAAAB3q16ll-SpQfSZ6k_W6SG_cvDNdiO6VPNxj1Aaw7z9rpN");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 	
@@ -109,7 +104,7 @@ public class DropBoxManager implements FileManager {
 	}
 
 	@Override
-	public File setFileName(String fileName) throws InvalidArgument {
+	public File setDestinationPath(String fileName) throws InvalidArgument {
 		int index = fileName.indexOf('/');
 		if (index<=0) {
 			throw new InvalidArgument("Unable to locate token. "+"FileName should conform to the format access_token/path");
@@ -122,7 +117,20 @@ public class DropBoxManager implements FileManager {
 		if (!path.startsWith("/")) {
 			path = "/"+path;
 		}
-		path = DefaultNameDecoder.INSTANCE.decode(path);
+		path = getPathDecoder().decodePath(path);
 		return null;
+	}
+
+	public static void main(String[] args) {
+		try {
+			ProxyOptions options = new ProxyOptions();
+			CmdLineParser parser = new CmdLineParser(options);
+			parser.parseArgument(args);
+			DropBoxManager archiver = new DropBoxManager(new DefaultPathDecoder(), options);
+			archiver.getToken();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
