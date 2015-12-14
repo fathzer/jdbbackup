@@ -3,7 +3,7 @@ package com.fathzer.jdbbackup;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
-public class Options {
+public class Options extends ProxyOptions {
     @Argument(index = 0, metaVar="base", usage ="Data base name", required=true)
     private String dbName;
     
@@ -22,7 +22,7 @@ public class Options {
     @Option(name = "-pwd", metaVar="dbPassword", usage = "Data base user password")
     private String dbPwd;
 
-    @Option(name="-t", metaVar="target", usage = "Where to store the backup (local file, dropbox)")
+    @Option(name="-t", metaVar="target", usage = "Where to store the backup (local file system, dropbox)")
     private String target = "file";
     
 	public String getDbName() {
