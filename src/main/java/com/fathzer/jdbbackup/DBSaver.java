@@ -16,35 +16,42 @@ public class DBSaver {
 	}
 	
 	public File save(Options params, File destFile) throws IOException {
-		List<String> commands = getCommand(params, params.getDbName());
+		final List<String> commands = getCommand(params, params.getDbName());
 
-		ProcessBuilder pb = new ProcessBuilder(commands);
+		final ProcessBuilder pb = new ProcessBuilder(commands);
 		if (destFile==null) {
 			destFile = File.createTempFile("DBDump", ".gz");
 			destFile.deleteOnExit();
+		} else {
+			File parentFile = destFile.getParentFile();
+			if (!parentFile.exists() && !parentFile.mkdirs()) {
+				throw new IOException("Unable to create directory "+parentFile);
+			}
 		}
-		Process process = pb.start();
-		final InputStream in = process.getInputStream();
-		Compressor compressor = new Compressor(destFile, in);
-		Thread compressThread = new Thread(compressor);
+		final Process process = pb.start();
+		final ProcessContext context = new ProcessContext(process);
+		final Compressor compressor = new Compressor(destFile, context);
+		final Thread compressThread = new Thread(compressor);
 		compressThread.start();
 		final InputStream err = process.getErrorStream();
 		Thread errorThread = new Thread(new Runnable(){
 			@Override
 			public void run() {
-				Logger logger = LoggerFactory.getLogger(DBSaver.this.getClass());
+				final Logger logger = LoggerFactory.getLogger(DBSaver.this.getClass());
 				try (BufferedReader bufErr = new BufferedReader(new InputStreamReader(err))) {
 					for (String line = bufErr.readLine(); line!=null; line = bufErr.readLine()) {
 						logger.warn(line);
 					}
 				} catch (IOException e) {
-					logger.error("Error while reading error stream", e);
+					if (!context.isKilled()) {
+						logger.error("Error while reading error stream", e);
+					}
 				}
 			}});
 		errorThread.start();
 		
 		try {
-			int result = process.waitFor();
+			final int result = process.waitFor();
 			compressThread.join();
 			errorThread.join();
 			if (compressor.getError()!=null) {
