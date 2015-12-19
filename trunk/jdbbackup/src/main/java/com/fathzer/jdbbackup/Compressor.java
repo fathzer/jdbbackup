@@ -9,16 +9,17 @@ import java.util.zip.GZIPOutputStream;
 
 final class Compressor implements Runnable {
 	private final File destFile;
-	private final InputStream in;
+	private final ProcessContext process;
 	private volatile IOException err;
 
-	Compressor(File destFile, InputStream in) {
+	Compressor(File destFile, ProcessContext process) {
 		this.destFile = destFile;
-		this.in = in;
+		this.process = process;
 	}
 
 	@Override
 	public void run() {
+		InputStream in = process.getInputStream();
 		try (OutputStream out = new GZIPOutputStream(new FileOutputStream(destFile))) {
 			for (int c=in.read(); c!=-1; c=in.read()) {
 				out.write(c);
@@ -26,6 +27,7 @@ final class Compressor implements Runnable {
 			out.close();
 		} catch (IOException e) {
 			this.err = e;
+			process.kill();
 		}
 	}
 
