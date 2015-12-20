@@ -5,14 +5,25 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/** Default {@link PathDecoder}.
+ * <br>It accepts patterns that have the format {<i>name</i>=<i>value</i>} where <i>name</i> is a lowercase string that identifies the kind of pattern and
+ * <i>value</i> is a string that contains the pattern itself (note that the pattern can not contains '}' character.
+ * <br>This class only supports one pattern kind: <b>d</b>. The <i>value</i> should be a valid date time pattern
+ * as described in <a href="http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html">SimpleDateFormat</a>.
+ * <br>For example, the pattern {d=yyyy} should be replaced by the year on 4 characters at runtime.
+ * <br>You can add your own pattern kind by overriding {@link #decode(String, String)} method.
+ */
 public class DefaultPathDecoder implements PathDecoder {
 	private static final Pattern PATTERN = Pattern.compile("\\{(\\p{Lower}+)=([^\\}]+)\\}");
 	public static final PathDecoder INSTANCE = new DefaultPathDecoder();
 
+	/** Constructor.
+	 */
 	public DefaultPathDecoder() {
 		super();
 	}
 
+	@Override
 	public String decodePath(String path) throws IllegalNamePattern {
 		Matcher m = PATTERN.matcher(path);
 		StringBuilder sb = new StringBuilder();
@@ -38,15 +49,22 @@ public class DefaultPathDecoder implements PathDecoder {
 		return sb.toString();
 	}
 	
-	protected CharSequence decode(String option, String value) throws IllegalNamePattern {
-		if ("d".equals(option)) {
+	/** Decodes a pattern.
+	 * <br>See {@link DefaultPathDecoder class comments} to learn what names are supported.
+	 * @param name The pattern name.
+	 * @param value The pattern value.
+	 * @return The decoded pattern.
+	 * @throws IllegalNamePattern If the name in not a valid name or value is not a wlid valid for <i>name</i> pattern.
+	 */
+	protected CharSequence decode(String name, String value) throws IllegalNamePattern {
+		if ("d".equals(name)) {
 			try {
 				return new SimpleDateFormat(value).format(new Date());
 			} catch (IllegalArgumentException e) {
-				throw new IllegalNamePattern(value+" is not a valid argument for "+option+" pattern");
+				throw new IllegalNamePattern(value+" is not a valid value for "+name+" pattern");
 			}
 		} else {
-			throw new IllegalNamePattern(option+" is not a valid pattern name");
+			throw new IllegalNamePattern(name+" is not a valid pattern name");
 		}
 	}
 }

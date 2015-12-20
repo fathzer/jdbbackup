@@ -13,12 +13,10 @@ import com.fathzer.jdbbackup.dropbox.DropBoxManager;
 public class JDbBackup {
 	protected CmdLineParser parser;
 	protected Options options;
-	protected PathDecoder pathDecoder;
 	
 	private JDbBackup() {
 		options = new Options();
 		parser = new CmdLineParser(options);
-		pathDecoder = new DefaultPathDecoder();
 	}
 	
 	public static void main(String[] args) {
@@ -57,9 +55,9 @@ public class JDbBackup {
 	
 	protected DestinationManager getFileManager() throws InvalidArgument {
 		if ("dropbox".equals(options.getTarget())) {
-			return new DropBoxManager(pathDecoder);
+			return new DropBoxManager();
 		} else if ("file".equals(options.getTarget())) {
-			return new FileManager(pathDecoder);
+			return new FileManager();
 		} else {
 			throw new InvalidArgument("Unknown target: "+options.getTarget());
 		}

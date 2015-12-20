@@ -3,11 +3,13 @@ package com.fathzer.jdbbackup;
 import java.io.File;
 import java.io.IOException;
 
-/** A file manager that saves the backups locally.
+/** A destination manager that saves the backups locally.
+ * <br>It uses an instance of {@link DefaultPathDecoder} in order to build the destination path.
+ * To change this behaviour, you should override the {@link #getPathDecoder()} method.
  */
 public class FileManager extends DestinationManager {
-	protected FileManager(PathDecoder pathDecoder) {
-		super(pathDecoder);
+	protected FileManager() {
+		super();
 	}
 
 	@Override
@@ -20,4 +22,8 @@ public class FileManager extends DestinationManager {
 		// Do nothing, file is already saved at the right place
 	}
 
+	@Override
+	public PathDecoder getPathDecoder() {
+		return new DefaultPathDecoder();
+	}
 }

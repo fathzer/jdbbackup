@@ -6,20 +6,16 @@ import java.io.IOException;
 /** An abstract class to manage where backup are saved.
  */
 public abstract class DestinationManager {
-	private PathDecoder pathDecoder;
 	/** Constructor.
-	 * @param pathDecoder The instance used to decode the path.
 	 */
-	protected DestinationManager(PathDecoder pathDecoder) {
-		this.pathDecoder = pathDecoder;
+	protected DestinationManager() {
+		super();
 	}
 	
-	/** Gets the path decoder.
+	/** Gets the path decoder used to decode the path when calling {@link #setDestinationPath(String)}.
 	 * @return a path decoder.
 	 */
-	public PathDecoder getPathDecoder() {
-		return pathDecoder;
-	}
+	public abstract PathDecoder getPathDecoder();
 
 	/** Sets the destination of next backup. 
 	 * @param path The path as it is entered in the command line (example:"{d=YYYY}/baseName")
