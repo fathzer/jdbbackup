@@ -26,8 +26,10 @@ final class Compressor implements Runnable {
 			}
 			out.close();
 		} catch (IOException e) {
-			this.err = e;
-			process.kill();
+			if (!process.isKilled()) {
+				this.err = e;
+				process.kill();
+			}
 		}
 	}
 

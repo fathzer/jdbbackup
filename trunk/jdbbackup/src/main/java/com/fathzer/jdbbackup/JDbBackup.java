@@ -2,6 +2,7 @@ package com.fathzer.jdbbackup;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -31,13 +32,10 @@ public class JDbBackup {
             System.err.println("java "+JDbBackup.class.getName()+" [options...] "+getArguments(p));
             // print the list of available options
             p.printUsage(System.err);
-        } catch (IOException e) {
-        	//TODO
-        	e.printStackTrace();
         }
 	}
 
-	private void doIt(String[] args) throws InvalidArgument, IOException {
+	private void doIt(String[] args) throws InvalidArgument {
 		try {
 			// parse the arguments.
 			parser.parseArgument(args);
@@ -46,11 +44,15 @@ public class JDbBackup {
 		}
 		DestinationManager manager = getFileManager();
 		File destFile = manager.setDestinationPath(options.getFileName());
-		//TODO catch IOException in order to separate problems during data extract and during saving the extraction
-		destFile = new DBSaver().save(options, destFile);
-		if (destFile!=null) {
-			manager.send(destFile);
-		}
+		try {
+			destFile = new DBSaver().save(options, destFile);
+			if (destFile!=null) {
+				manager.send(destFile);
+			}
+		} catch (IOException e) {
+        	System.err.println("An error occurred while using arguments "+Arrays.toString(args));
+        	e.printStackTrace();
+        }
 	}
 	
 	protected DestinationManager getFileManager() throws InvalidArgument {
