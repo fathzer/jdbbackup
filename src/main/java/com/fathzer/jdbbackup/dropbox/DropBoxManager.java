@@ -25,27 +25,27 @@ import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.DbxWebAuthNoRedirect;
 import com.dropbox.core.DbxWriteMode;
 import com.dropbox.core.http.StandardHttpRequestor;
-import com.fathzer.jdbbackup.DefaultPathDecoder;
-import com.fathzer.jdbbackup.DestinationManager;
+import com.fathzer.jdbbackup.FileManager;
 import com.fathzer.jdbbackup.InvalidArgument;
-import com.fathzer.jdbbackup.PathDecoder;
 import com.fathzer.jdbbackup.ProxyOptions;
 
-/** A file manager that saves the backups to a dropbox account.
+/** A destination manager that saves the backups to a dropbox account.
  */
-public class DropBoxManager extends DestinationManager {
+public class DropBoxManager extends FileManager {
 	private static final String NAME = "jDbBackup";
 	private DbxRequestConfig config;
 	private String token;
 	private String path;
 	
-	public DropBoxManager(PathDecoder pathDecoder) {
-		super(pathDecoder);
+	/** Constructor.
+	 */
+	public DropBoxManager() {
+		super();
 		this.config = new DbxRequestConfig(NAME, Locale.getDefault().toString());
 	}
 
-	public DropBoxManager(PathDecoder pathDecoder, final ProxyOptions options) {
-		super(pathDecoder);
+	public DropBoxManager(final ProxyOptions options) {
+		super();
 		Proxy proxy = Proxy.NO_PROXY;
 		if (options.getProxyHost()!=null) {
 	        proxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(options.getProxyHost(),options.getProxyPort()));
@@ -126,7 +126,7 @@ public class DropBoxManager extends DestinationManager {
 			ProxyOptions options = new ProxyOptions();
 			CmdLineParser parser = new CmdLineParser(options);
 			parser.parseArgument(args);
-			DropBoxManager archiver = new DropBoxManager(new DefaultPathDecoder(), options);
+			DropBoxManager archiver = new DropBoxManager(options);
 			archiver.getToken();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
