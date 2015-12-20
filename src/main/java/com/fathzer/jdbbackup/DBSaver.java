@@ -1,4 +1,5 @@
 package com.fathzer.jdbbackup;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +45,7 @@ public class DBSaver {
 					}
 				} catch (IOException e) {
 					if (!context.isKilled()) {
+						context.kill();
 						logger.error("Error while reading error stream", e);
 					}
 				}
@@ -57,7 +59,10 @@ public class DBSaver {
 			if (compressor.getError()!=null) {
 				throw compressor.getError();
 			}
-			return result == 0 && compressor.getError()==null ? destFile : null;
+			if (result!=0) {
+				throw new RuntimeException ("Process failed"); //TODO
+			}
+			return destFile;
 		} catch (InterruptedException e) {
 			LoggerFactory.getLogger(getClass()).error("Backup was interrupted", e);
 			return null;
