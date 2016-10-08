@@ -7,7 +7,7 @@
 		<version>1.0.2</version>
 	</parent>
 	<artifactId>jdbbackup</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2</version>
 	<description>A simple java library to perform db backup stored in dropbox</description>
 	<scm>
 		<url>http://svn.code.sf.net/p/jdbbackup/code/trunk/jdbbackup</url>
@@ -17,7 +17,7 @@
 		<dependency>
 			<groupId>com.dropbox.core</groupId>
 			<artifactId>dropbox-core-sdk</artifactId>
-			<version>[1.7,1.8)</version>
+			<version>2.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -45,44 +45,6 @@
 					<source>1.7</source>
 					<target>1.7</target>
 				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.2</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<minimizeJar>true</minimizeJar>
-							<finalName>jdbbackup</finalName>
-							<filters>
-								<filter>
-									<!-- Remove signatures and other useless stuff -->
-									<artifact>*:*</artifact>
-									<excludes>
-										<exclude>license/**</exclude>
-										<exclude>META-INF/**</exclude>
-										<exclude>mozilla/**</exclude>
-									</excludes>
-								</filter>
-							</filters>
-							<transformers>
-								<transformer
-									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<manifestEntries>
-										<Main-Class>com.fathzer.jdbbackup.JDbBackup</Main-Class>
-										<Permissions>all-permissions</Permissions>
-										<Application-Name>JDbBackup</Application-Name>
-										<Trusted-Only>true</Trusted-Only>
-									</manifestEntries>
-								</transformer>
-							</transformers>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>

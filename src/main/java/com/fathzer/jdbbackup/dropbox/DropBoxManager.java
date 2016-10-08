@@ -10,7 +10,6 @@ import java.net.Authenticator;
 import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
-import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -18,13 +17,15 @@ import org.kohsuke.args4j.CmdLineParser;
 
 import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxAuthFinish;
-import com.dropbox.core.DbxClient;
-import com.dropbox.core.DbxEntry;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
-import com.dropbox.core.DbxWebAuthNoRedirect;
-import com.dropbox.core.DbxWriteMode;
+import com.dropbox.core.DbxWebAuth;
 import com.dropbox.core.http.StandardHttpRequestor;
+import com.dropbox.core.http.StandardHttpRequestor.Config;
+import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.UploadBuilder;
+import com.dropbox.core.v2.files.WriteMode;
 import com.fathzer.jdbbackup.FileManager;
 import com.fathzer.jdbbackup.InvalidArgument;
 import com.fathzer.jdbbackup.ProxyOptions;
@@ -41,14 +42,14 @@ public class DropBoxManager extends FileManager {
 	 */
 	public DropBoxManager() {
 		super();
-		this.config = new DbxRequestConfig(NAME, Locale.getDefault().toString());
+		this.config = new DbxRequestConfig(NAME);
 	}
 
 	public DropBoxManager(final ProxyOptions options) {
 		super();
-		Proxy proxy = Proxy.NO_PROXY;
+		Config.Builder builder = Config.builder();
 		if (options.getProxyHost()!=null) {
-	        proxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(options.getProxyHost(),options.getProxyPort()));
+	        Proxy proxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(options.getProxyHost(),options.getProxyPort()));
 			if (options.getProxyUser() != null) {
 				Authenticator.setDefault(new Authenticator() {
 					@Override
@@ -57,52 +58,26 @@ public class DropBoxManager extends FileManager {
 					}
 				});
 			}
+			builder.withProxy(proxy);
 		}
-		this.config = new DbxRequestConfig(NAME, Locale.getDefault().toString(), new StandardHttpRequestor(proxy));
+		DbxRequestConfig.Builder rbuilder = DbxRequestConfig.newBuilder(NAME);
+		rbuilder.withHttpRequestor(new StandardHttpRequestor(builder.build()));
+		this.config = rbuilder.build();
 	}
 	
 	@Override
 	public void send(File file) throws IOException {
-		DbxClient client = new DbxClient(config, token);
+		DbxClientV2 client = new DbxClientV2(config, token);
 		try (InputStream in = new FileInputStream(file)) {
-			DbxEntry.File entry = client.uploadFile(path, DbxWriteMode.force(), file.length(), in); 
-			System.out.println("Sent to Dropbox: "+entry.name+"("+entry.rev+")");
+			UploadBuilder builder = client.files().uploadBuilder(path);
+			builder.withMode(WriteMode.OVERWRITE);
+			FileMetadata data = builder.uploadAndFinish(in, file.length());
+			System.out.println("Sent to Dropbox: "+data.getName()+"("+data.getRev()+")");
 		} catch (DbxException e) {
 			throw new IOException(e);
 		}
 	}
 	
-	private void getToken() {
-        DbxWebAuthNoRedirect webAuth = new DbxWebAuthNoRedirect(config, getDbxAppInfo());
-        String authorizeUrl = webAuth.start();
-        System.out.println("1. Go to: " + authorizeUrl);
-        System.out.println("2. Click \"Allow\" (you might have to log in first)");
-        System.out.println("3. Enter the authorization code there:");
-		try {
-			String code = new BufferedReader(new InputStreamReader(System.in)).readLine().trim();
-			System.out.println("Please wait ...");
-	        DbxAuthFinish authFinish = webAuth.finish(code);
-	        String accessToken = authFinish.accessToken;
-	        System.out.println("Your token is: "+accessToken);
-	        System.out.println("Keep it in a secure place as it allows to access to your yaback folder on Dropbox");
-		} catch (Exception e) {
-			System.err.println ("Sorry, an error occurred:");
-			e.printStackTrace();
-		}
-	}
-	
-	private static DbxAppInfo getDbxAppInfo() {
-		// For obvious reasons, your application keys and secret are not released with the source files.
-		// You should edit keys.properties in order to run this demo
-		ResourceBundle bundle = ResourceBundle.getBundle(DropBoxManager.class.getPackage().getName()+".keys"); //$NON-NLS-1$
-		String key = bundle.getString("appKey");
-		String secret = bundle.getString("appSecret");
-		if (key.length()==0 || secret.length()==0) {
-			throw new MissingResourceException("App key and secret not provided","","");
-		}
-		return new DbxAppInfo(key, secret);
-	}
-
 	@Override
 	public File setDestinationPath(String fileName) throws InvalidArgument {
 		int index = fileName.indexOf('/');
@@ -119,6 +94,41 @@ public class DropBoxManager extends FileManager {
 		}
 		path = getPathDecoder().decodePath(path);
 		return null;
+	}
+	
+	private void getToken() {
+	    DbxAppInfo appInfo = getDbxAppInfo();
+	    DbxWebAuth auth = new DbxWebAuth(config, appInfo);
+	    DbxWebAuth.Request authRequest = DbxWebAuth.newRequestBuilder()
+	             .withNoRedirect()
+	             .build();
+        String authorizeUrl = auth.authorize(authRequest);
+        System.out.println("1. Go to: " + authorizeUrl);
+        System.out.println("2. Click \"Allow\" (you might have to log in first)");
+        System.out.println("3. Enter the authorization code there:");
+		try {
+			String code = new BufferedReader(new InputStreamReader(System.in)).readLine().trim();
+			System.out.println("Please wait ...");
+	        DbxAuthFinish authFinish = auth.finishFromCode(code);
+	        String accessToken = authFinish.getAccessToken();
+	        System.out.println("Your token is: "+accessToken);
+	        System.out.println("Keep it in a secure place as it allows to access to your backup folder on Dropbox");
+		} catch (Exception e) {
+			System.err.println ("Sorry, an error occurred:");
+			e.printStackTrace();
+		}
+	}
+	
+	private static DbxAppInfo getDbxAppInfo() {
+		// For obvious reasons, your application keys and secret are not released with the source files.
+		// You should edit keys.properties in order to run this demo
+		ResourceBundle bundle = ResourceBundle.getBundle(DropBoxManager.class.getPackage().getName()+".keys"); //$NON-NLS-1$
+		String key = bundle.getString("appKey");
+		String secret = bundle.getString("appSecret");
+		if (key.length()==0 || secret.length()==0) {
+			throw new MissingResourceException("App key and secret not provided","","");
+		}
+		return new DbxAppInfo(key, secret);
 	}
 
 	public static void main(String[] args) {
