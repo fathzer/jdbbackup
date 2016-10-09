@@ -27,7 +27,8 @@ public abstract class DestinationManager {
 	
 	/** Sends the backup file to its final destination at the path passed in {@link #setDestinationPath}.
 	 * @param file The temporary file
+	 * @return a message indicating where the file was sent
 	 * @throws IOException If an error occurs while sending the file
 	 */
-	public abstract void send(File file) throws IOException;
+	public abstract String send(File file) throws IOException;
 }
