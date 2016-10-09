@@ -66,15 +66,17 @@ public class DropBoxManager extends FileManager {
 	}
 	
 	@Override
-	public void send(File file) throws IOException {
+	public String send(File file) throws IOException {
 		DbxClientV2 client = new DbxClientV2(config, token);
 		try (InputStream in = new FileInputStream(file)) {
 			UploadBuilder builder = client.files().uploadBuilder(path);
 			builder.withMode(WriteMode.OVERWRITE);
 			FileMetadata data = builder.uploadAndFinish(in, file.length());
-			System.out.println("Sent to Dropbox: "+data.getName()+"("+data.getRev()+")");
+			return "Sent to Dropbox: "+data.getPathDisplay()+" (rev: "+data.getRev()+")";
 		} catch (DbxException e) {
 			throw new IOException(e);
+		} finally {
+			file.delete();
 		}
 	}
 	
@@ -87,7 +89,7 @@ public class DropBoxManager extends FileManager {
 		this.token = fileName.substring(0, index);
 		this.path = fileName.substring(index+1);
 		if (this.path.isEmpty()) {
-			throw new InvalidArgument("Unable to locate destination path. "+"FileName should conform to the format access_token/path");
+			throw new InvalidArgument("Unable to locate destination path. Path should conform to the format access_token/path");
 		}
 		if (!path.startsWith("/")) {
 			path = "/"+path;

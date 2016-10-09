@@ -18,8 +18,9 @@ public class FileManager extends DestinationManager {
 	}
 
 	@Override
-	public void send(File file) throws IOException {
+	public String send(File file) throws IOException {
 		// Do nothing, file is already saved at the right place
+		return "Saved to: "+file.getAbsolutePath();
 	}
 
 	@Override

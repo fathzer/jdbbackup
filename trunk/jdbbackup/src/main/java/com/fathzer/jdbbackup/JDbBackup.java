@@ -11,12 +11,9 @@ import org.kohsuke.args4j.spi.OptionHandler;
 import com.fathzer.jdbbackup.dropbox.DropBoxManager;
 
 public class JDbBackup {
-	protected CmdLineParser parser;
-	protected Options options;
 	
-	private JDbBackup() {
-		options = new Options();
-		parser = new CmdLineParser(options);
+	public JDbBackup() {
+		super();
 	}
 	
 	public static void main(String[] args) {
@@ -34,32 +31,41 @@ public class JDbBackup {
 	}
 
 	private void doIt(String[] args) throws InvalidArgument {
+		Options options = new Options();
+		CmdLineParser parser = new CmdLineParser(options);
 		try {
 			// parse the arguments.
 			parser.parseArgument(args);
 		} catch(CmdLineException e) {
 			throw new InvalidArgument(e);
 		}
-		DestinationManager manager = getFileManager();
-		File destFile = manager.setDestinationPath(options.getFileName());
 		try {
-			destFile = new DBSaver().save(options, destFile);
-			if (destFile!=null) {
-				manager.send(destFile);
-			}
+			System.out.println(backup(options));
 		} catch (IOException e) {
         	System.err.println("An error occurred while using arguments "+Arrays.toString(args));
         	e.printStackTrace();
         }
 	}
 	
-	protected DestinationManager getFileManager() throws InvalidArgument {
-		if ("dropbox".equals(options.getTarget())) {
+	public String backup(Options options) throws InvalidArgument, IOException {
+		try {
+			Destination destination = new Destination(options.getDestination());
+			DestinationManager manager = getFileManager(destination);
+			File destFile = manager.setDestinationPath(destination.getPath());
+			destFile = new DBSaver().save(options, destFile);
+			return destFile==null ? null : manager.send(destFile);
+		} catch (IllegalArgumentException e) {
+			throw new InvalidArgument(e.getMessage());
+		}
+	}
+	
+	protected DestinationManager getFileManager(Destination destination) throws InvalidArgument {
+		if ("dropbox".equals(destination.getType())) {
 			return new DropBoxManager();
-		} else if ("file".equals(options.getTarget())) {
+		} else if ("file".equals(destination.getType())) {
 			return new FileManager();
 		} else {
-			throw new InvalidArgument("Unknown target: "+options.getTarget());
+			throw new InvalidArgument("Unknown protocol: "+destination.getType());
 		}
 	}
 
