@@ -20,7 +20,7 @@ public class DBSaver {
 	 * @param params The parameters to access to database to save 
 	 * @param destFile the backup destination file or null to backup database in a temporary file.
 	 * @return The file where database has been saved.
-	 * @throws IOException
+	 * @throws IOException If something went wrong
 	 */
 	public File save(Options params, File destFile) throws IOException {
 		final List<String> commands = getCommand(params, params.getDbName());
