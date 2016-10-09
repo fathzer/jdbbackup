@@ -24,4 +24,16 @@ public class ProxyOptions {
 	public String getProxyPwd() {
 		return proxyPwd;
 	}
+	public void setProxyHost(String proxyHost) {
+		this.proxyHost = proxyHost;
+	}
+	public void setProxyPort(int proxyPort) {
+		this.proxyPort = proxyPort;
+	}
+	public void setProxyUser(String proxyUser) {
+		this.proxyUser = proxyUser;
+	}
+	public void setProxyPwd(String proxyPwd) {
+		this.proxyPwd = proxyPwd;
+	}
 }
