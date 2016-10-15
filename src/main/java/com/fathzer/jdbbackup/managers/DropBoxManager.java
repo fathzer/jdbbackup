@@ -1,4 +1,4 @@
-package com.fathzer.jdbbackup.dropbox;
+package com.fathzer.jdbbackup.managers;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,13 +26,15 @@ import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.UploadBuilder;
 import com.dropbox.core.v2.files.WriteMode;
-import com.fathzer.jdbbackup.FileManager;
+import com.fathzer.jdbbackup.DefaultPathDecoder;
+import com.fathzer.jdbbackup.DestinationManager;
 import com.fathzer.jdbbackup.InvalidArgument;
+import com.fathzer.jdbbackup.PathDecoder;
 import com.fathzer.jdbbackup.ProxyOptions;
 
 /** A destination manager that saves the backups to a dropbox account.
  */
-public class DropBoxManager extends FileManager {
+public class DropBoxManager implements DestinationManager {
 	private static final String NAME = "jDbBackup";
 	private DbxRequestConfig config;
 	private String token;
@@ -132,6 +134,11 @@ public class DropBoxManager extends FileManager {
 		}
 		return new DbxAppInfo(key, secret);
 	}
+	
+	@Override
+	public PathDecoder getPathDecoder() {
+		return new DefaultPathDecoder();
+	}
 
 	public static void main(String[] args) {
 		try {
@@ -144,5 +151,10 @@ public class DropBoxManager extends FileManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public String getProtocol() {
+		return "dropbox";
 	}
 }

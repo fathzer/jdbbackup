@@ -3,12 +3,12 @@ package com.fathzer.jdbbackup;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Set;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.spi.OptionHandler;
-
-import com.fathzer.jdbbackup.dropbox.DropBoxManager;
+import org.reflections.Reflections;
 
 public class JDbBackup {
 	
@@ -50,7 +50,7 @@ public class JDbBackup {
 	public String backup(Options options) throws InvalidArgument, IOException {
 		try {
 			Destination destination = new Destination(options.getDestination());
-			DestinationManager manager = getFileManager(destination);
+			DestinationManager manager = getDestinationManager(destination);
 			File destFile = manager.setDestinationPath(destination.getPath());
 			destFile = new DBSaver().save(options, destFile);
 			return destFile==null ? null : manager.send(destFile);
@@ -59,14 +59,21 @@ public class JDbBackup {
 		}
 	}
 	
-	protected DestinationManager getFileManager(Destination destination) throws InvalidArgument {
-		if ("dropbox".equals(destination.getType())) {
-			return new DropBoxManager();
-		} else if ("file".equals(destination.getType())) {
-			return new FileManager();
-		} else {
-			throw new InvalidArgument("Unknown protocol: "+destination.getType());
+	private DestinationManager getDestinationManager(Destination destination) throws InvalidArgument {
+		Reflections reflections = new Reflections("");
+		Set<Class<? extends DestinationManager>> classes = reflections.getSubTypesOf(DestinationManager.class);
+		for (Class<? extends DestinationManager> implClass : classes) {
+			DestinationManager candidate;
+			try {
+				candidate = implClass.newInstance();
+			} catch (InstantiationException | IllegalAccessException e) {
+				throw new RuntimeException(e);
+			}
+			if (candidate.getProtocol().equals(destination.getType())) {
+				return candidate;
+			}
 		}
+		throw new InvalidArgument("Unknown protocol: "+destination.getType());
 	}
 
 	private static CharSequence getArguments(CmdLineParser parser) {

@@ -5,17 +5,12 @@ import java.io.IOException;
 
 /** An abstract class to manage where backup are saved.
  */
-public abstract class DestinationManager {
-	/** Constructor.
-	 */
-	protected DestinationManager() {
-		super();
-	}
+public interface DestinationManager {
 	
 	/** Gets the path decoder used to decode the path when calling {@link #setDestinationPath(String)}.
 	 * @return a path decoder.
 	 */
-	public abstract PathDecoder getPathDecoder();
+	PathDecoder getPathDecoder();
 
 	/** Sets the destination of next backup. 
 	 * @param path The path as it is entered in the command line (example:"{d=YYYY}/baseName")
@@ -23,12 +18,14 @@ public abstract class DestinationManager {
 	 * <br>If the final destination of the backup is the file system, this method will typically return the final destination.
 	 * @throws InvalidArgument If the path is not valid.
 	 */
-	public abstract File setDestinationPath(String path) throws InvalidArgument;
+	File setDestinationPath(String path) throws InvalidArgument;
 	
 	/** Sends the backup file to its final destination at the path passed in {@link #setDestinationPath}.
 	 * @param file The temporary file
 	 * @return a message indicating where the file was sent
 	 * @throws IOException If an error occurs while sending the file
 	 */
-	public abstract String send(File file) throws IOException;
+	String send(File file) throws IOException;
+	
+	String getProtocol();
 }
