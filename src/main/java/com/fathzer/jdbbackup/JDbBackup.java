@@ -11,7 +11,6 @@ import org.kohsuke.args4j.spi.OptionHandler;
 import org.reflections.Reflections;
 
 public class JDbBackup {
-	
 	public JDbBackup() {
 		super();
 	}
