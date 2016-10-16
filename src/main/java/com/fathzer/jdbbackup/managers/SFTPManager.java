@@ -12,10 +12,12 @@ import com.fathzer.jdbbackup.DefaultPathDecoder;
 import com.fathzer.jdbbackup.DestinationManager;
 import com.fathzer.jdbbackup.InvalidArgument;
 import com.fathzer.jdbbackup.PathDecoder;
+import com.fathzer.jdbbackup.ProxyOptions;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.ProxyHTTP;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
@@ -26,9 +28,20 @@ public class SFTPManager implements DestinationManager {
 	private int port;
 	private String destPath;
 	private String destFilename;
+	private ProxyHTTP proxy;
 	
 	public SFTPManager() {
 		super();
+	}
+
+	@Override
+	public void setProxy(ProxyOptions options) {
+		if (options.getProxyHost()!=null) {
+	        proxy = new ProxyHTTP(options.getProxyHost(),options.getProxyPort());
+			if (options.getProxyUser() != null) {
+				proxy.setUserPasswd(options.getProxyUser(), options.getProxyPwd());
+			}
+		}
 	}
 
 	@Override
@@ -104,6 +117,9 @@ public class SFTPManager implements DestinationManager {
 		try {
 			JSch jsch = new JSch();
 			Session session = jsch.getSession(user, host, port);
+			if (proxy!=null) {
+				session.setProxy(proxy);
+			}
 			session.setPassword(password);
 			java.util.Properties config = new java.util.Properties();
 			config.put("StrictHostKeyChecking", "no");
