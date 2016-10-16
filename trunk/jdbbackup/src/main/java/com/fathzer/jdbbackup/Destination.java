@@ -8,11 +8,17 @@ public class Destination {
 		int index = dest.indexOf(':');
 		if (index<=0) {
 			throw new IllegalArgumentException ("Destination type is missing in "+dest);
-		} else if (index==dest.length()-1) {
-			throw new IllegalArgumentException ("Destination path is missing in "+dest);
 		}
 		this.type = dest.substring(0, index);
-		this.path = dest.substring(index+1);
+		for (int i=1;i<=2;i++) {
+			if (index+i>=dest.length() || dest.charAt(index+i)!='/') {
+				throw new IllegalArgumentException("Destination has not the right format: "+dest+" does not not match type://path");
+			}
+		}
+		this.path = dest.substring(index+3);
+		if (this.path.isEmpty()) {
+			throw new IllegalArgumentException ("Destination path is missing in "+dest);
+		}
 	}
 
 	public String getType() {

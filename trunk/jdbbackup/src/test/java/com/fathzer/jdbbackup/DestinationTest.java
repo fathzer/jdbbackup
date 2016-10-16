@@ -10,7 +10,7 @@ public class DestinationTest {
 	public void test() {
 		String path = "gkfsdjg-Sp_c/{d=yy}/photos-{d=dd-MM}";
 		String type = "dropbox";
-		Destination dest = new Destination(type+":"+path);
+		Destination dest = new Destination(type+"://"+path);
 		assertEquals(type,dest.getType());
 		assertEquals(path,dest.getPath());
 	}
@@ -27,6 +27,6 @@ public class DestinationTest {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testNoPath() {
-		new Destination("xxx:");
+		new Destination("xxx://");
 	}
 }
