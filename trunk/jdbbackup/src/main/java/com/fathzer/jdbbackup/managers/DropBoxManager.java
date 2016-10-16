@@ -44,11 +44,10 @@ public class DropBoxManager implements DestinationManager {
 	 */
 	public DropBoxManager() {
 		super();
-		this.config = new DbxRequestConfig(NAME);
 	}
 
-	public DropBoxManager(final ProxyOptions options) {
-		super();
+	@Override
+	public void setProxy(final ProxyOptions options) {
 		Config.Builder builder = Config.builder();
 		if (options.getProxyHost()!=null) {
 	        Proxy proxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(options.getProxyHost(),options.getProxyPort()));
@@ -68,7 +67,7 @@ public class DropBoxManager implements DestinationManager {
 	}
 	
 	@Override
-	public String send(File file) throws IOException {
+	public String send(final File file) throws IOException {
 		DbxClientV2 client = new DbxClientV2(config, token);
 		try (InputStream in = new FileInputStream(file)) {
 			UploadBuilder builder = client.files().uploadBuilder(path);
@@ -83,7 +82,7 @@ public class DropBoxManager implements DestinationManager {
 	}
 	
 	@Override
-	public File setDestinationPath(String fileName) throws InvalidArgument {
+	public File setDestinationPath(final String fileName) throws InvalidArgument {
 		int index = fileName.indexOf('/');
 		if (index<=0) {
 			throw new InvalidArgument("Unable to locate token. "+"FileName should conform to the format access_token/path");
@@ -145,7 +144,8 @@ public class DropBoxManager implements DestinationManager {
 			ProxyOptions options = new ProxyOptions();
 			CmdLineParser parser = new CmdLineParser(options);
 			parser.parseArgument(args);
-			DropBoxManager archiver = new DropBoxManager(options);
+			DropBoxManager archiver = new DropBoxManager();
+			archiver.setProxy(options);
 			archiver.getToken();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

@@ -50,6 +50,7 @@ public class JDbBackup {
 		try {
 			Destination destination = new Destination(options.getDestination());
 			DestinationManager manager = getDestinationManager(destination);
+			manager.setProxy(options);
 			File destFile = manager.setDestinationPath(destination.getPath());
 			destFile = new DBSaver().save(options, destFile);
 			return destFile==null ? null : manager.send(destFile);

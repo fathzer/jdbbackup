@@ -7,6 +7,7 @@ import com.fathzer.jdbbackup.DefaultPathDecoder;
 import com.fathzer.jdbbackup.DestinationManager;
 import com.fathzer.jdbbackup.InvalidArgument;
 import com.fathzer.jdbbackup.PathDecoder;
+import com.fathzer.jdbbackup.ProxyOptions;
 
 /** A destination manager that saves the backups locally.
  * <br>It uses an instance of {@link DefaultPathDecoder} in order to build the destination path.
@@ -15,6 +16,11 @@ import com.fathzer.jdbbackup.PathDecoder;
 public class FileManager implements DestinationManager {
 	public FileManager() {
 		super();
+	}
+
+	@Override
+	public void setProxy(ProxyOptions options) {
+		// Ignore proxy as there's no network access there.
 	}
 
 	@Override
