@@ -50,7 +50,7 @@ public class DropBoxManager implements DestinationManager {
 	public void setProxy(final ProxyOptions options) {
 		Config.Builder builder = Config.builder();
 		if (options.getProxyHost()!=null) {
-	        Proxy proxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(options.getProxyHost(),options.getProxyPort()));
+			Proxy proxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(options.getProxyHost(),options.getProxyPort()));
 			if (options.getProxyUser() != null) {
 				Authenticator.setDefault(new Authenticator() {
 					@Override
