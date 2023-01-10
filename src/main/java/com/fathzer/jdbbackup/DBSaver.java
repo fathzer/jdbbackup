@@ -11,8 +11,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DBSaver {
-	public DBSaver() {
+/** A class able to save a database to a file.
+ */
+public abstract class DBSaver {
+	protected DBSaver() {
 		super();
 	}
 	
@@ -75,17 +77,10 @@ public class DBSaver {
 		}
     }
 
-	protected List<String> getCommand(Options params, String database) {
-		List<String> commands = new ArrayList<String>();
-		commands.add("mysqldump");
-		commands.add("--host="+params.getDbHost());
-		commands.add("--port="+params.getDbPort());
-		commands.add("--user="+params.getDbUser());
-		if (params.getDbPwd()!=null && !params.getDbPwd().isEmpty()) {
-			commands.add("--password="+params.getDbPwd());
-		}
-		commands.add("--add-drop-database");
-		commands.add(database);
-		return commands;
-	}
+	/** Gets the command line to execute to save the database.
+	 * @param params The database access parameters
+	 * @param database The name of the database
+	 * @return The list of the tokens that compose the command 
+	 */
+	protected abstract List<String> getCommand(Options params, String database);
 }

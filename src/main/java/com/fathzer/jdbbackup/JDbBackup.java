@@ -52,7 +52,7 @@ public class JDbBackup {
 			DestinationManager manager = getDestinationManager(destination);
 			manager.setProxy(options);
 			File destFile = manager.setDestinationPath(destination.getPath());
-			destFile = new DBSaver().save(options, destFile);
+			destFile = new MySQLSaver().save(options, destFile);
 			return destFile==null ? null : manager.send(destFile);
 		} catch (IllegalArgumentException e) {
 			throw new InvalidArgument(e.getMessage());
