@@ -22,6 +22,7 @@ import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.DbxWebAuth;
 import com.dropbox.core.http.StandardHttpRequestor;
 import com.dropbox.core.http.StandardHttpRequestor.Config;
+import com.dropbox.core.oauth.DbxCredential;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.UploadBuilder;
@@ -35,7 +36,9 @@ import com.fathzer.jdbbackup.ProxyOptions;
 /** A destination manager that saves the backups to a dropbox account.
  */
 public class DropBoxManager implements DestinationManager {
+	private static final String REFRESH_PREFIX = "refresh-";
 	private static final String NAME = "jDbBackup";
+	
 	private DbxRequestConfig config;
 	private String token;
 	private String path;
@@ -68,7 +71,7 @@ public class DropBoxManager implements DestinationManager {
 	
 	@Override
 	public String send(final File file) throws IOException {
-		DbxClientV2 client = new DbxClientV2(config, token);
+		DbxClientV2 client = new DbxClientV2(config, getCredential(token));
 		try (InputStream in = new FileInputStream(file)) {
 			UploadBuilder builder = client.files().uploadBuilder(path);
 			builder.withMode(WriteMode.OVERWRITE);
@@ -78,6 +81,15 @@ public class DropBoxManager implements DestinationManager {
 			throw new IOException(e);
 		} finally {
 			file.delete();
+		}
+	}
+	
+	private DbxCredential getCredential(String token) {
+		if (token.startsWith(REFRESH_PREFIX)) {
+			final DbxAppInfo info = getDbxAppInfo();
+			return new DbxCredential("fake", 0L, token.substring(REFRESH_PREFIX.length()), info.getKey(), info.getSecret());
+		} else {
+			return new DbxCredential(token);
 		}
 	}
 	
@@ -113,8 +125,8 @@ public class DropBoxManager implements DestinationManager {
 			String code = new BufferedReader(new InputStreamReader(System.in)).readLine().trim();
 			System.out.println("Please wait ...");
 	        DbxAuthFinish authFinish = auth.finishFromCode(code);
-	        String accessToken = authFinish.getAccessToken();
-	        System.out.println("Your token is: "+accessToken);
+	        String accessToken = authFinish.getRefreshToken();
+	        System.out.println("Your token is: "+REFRESH_PREFIX+accessToken);
 	        System.out.println("Keep it in a secure place as it allows to access to your backup folder on Dropbox");
 		} catch (Exception e) {
 			System.err.println ("Sorry, an error occurred:");

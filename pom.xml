@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.fathzer</groupId>
 		<artifactId>parent-pom</artifactId>
-		<version>1.0.3</version>
+		<version>1.0.5</version>
 	</parent>
 	<artifactId>jdbbackup</artifactId>
 	<version>0.0.3</version>
@@ -12,8 +12,14 @@
 		<url>https://github.com/fathzer/jdbbackup.git</url>
 		<connection>https://github.com/fathzer/jdbbackup.git</connection>
 	</scm>
-
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<maven.compiler.target>7</maven.compiler.target>
+		<maven.compiler.source>7</maven.compiler.source>
+		<animal-sniffer-signature>java17</animal-sniffer-signature>
+		<check-dependencies-java-version>1.7</check-dependencies-java-version>
+
 		<slf-version>1.7.36</slf-version>
 		<dropbox-version>3.2.1</dropbox-version>
 	</properties>
@@ -50,16 +56,22 @@
 			<artifactId>dropbox-core-sdk</artifactId>
 			<version>${dropbox-version}</version>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.2</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.10.1</version>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>animal-sniffer-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>
