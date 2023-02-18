@@ -5,13 +5,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** A class able to save a database to a file.
+/** A class able to save a database to a compressed (.gz) file.
+ * <br>Data base dump is obtained through a command line.
  */
 public abstract class DBSaver {
 	protected DBSaver() {
