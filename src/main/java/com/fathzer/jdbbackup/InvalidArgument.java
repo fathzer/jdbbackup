@@ -1,6 +1,6 @@
 package com.fathzer.jdbbackup;
 
-public class InvalidArgument extends Exception {
+public class InvalidArgument extends IllegalArgumentException {
 	private static final long serialVersionUID = 1L;
 
 	public InvalidArgument(String message) {
