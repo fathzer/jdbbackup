@@ -21,7 +21,7 @@
 		<animal-sniffer-signature>java18</animal-sniffer-signature>
 
 		<slf-version>1.7.36</slf-version>
-		<dropbox-version>3.2.1</dropbox-version>
+		<dropbox-version>5.4.4</dropbox-version>
 	</properties>
 
 	<dependencies>

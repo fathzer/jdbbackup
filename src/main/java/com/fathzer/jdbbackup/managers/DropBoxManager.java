@@ -13,6 +13,7 @@ import java.net.Proxy;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 import com.dropbox.core.DbxAppInfo;
@@ -111,29 +112,6 @@ public class DropBoxManager implements DestinationManager {
 		return null;
 	}
 	
-	private void getToken() {
-	    DbxAppInfo appInfo = getDbxAppInfo();
-	    DbxWebAuth auth = new DbxWebAuth(config, appInfo);
-	    DbxWebAuth.Request authRequest = DbxWebAuth.newRequestBuilder()
-	             .withNoRedirect()
-	             .build();
-        String authorizeUrl = auth.authorize(authRequest);
-        System.out.println("1. Go to: " + authorizeUrl);
-        System.out.println("2. Click \"Allow\" (you might have to log in first)");
-        System.out.println("3. Enter the authorization code there:");
-		try {
-			String code = new BufferedReader(new InputStreamReader(System.in)).readLine().trim();
-			System.out.println("Please wait ...");
-	        DbxAuthFinish authFinish = auth.finishFromCode(code);
-	        String accessToken = authFinish.getRefreshToken();
-	        System.out.println("Your token is: "+REFRESH_PREFIX+accessToken);
-	        System.out.println("Keep it in a secure place as it allows to access to your backup folder on Dropbox");
-		} catch (Exception e) {
-			System.err.println ("Sorry, an error occurred:");
-			e.printStackTrace();
-		}
-	}
-	
 	private static DbxAppInfo getDbxAppInfo() {
 		// For obvious reasons, your application keys and secret are not released with the source files.
 		// You should edit keys.properties in order to run this demo
@@ -151,22 +129,49 @@ public class DropBoxManager implements DestinationManager {
 		return new DefaultPathDecoder();
 	}
 
-	public static void main(String[] args) {
-		try {
-			ProxyOptions options = new ProxyOptions();
-			CmdLineParser parser = new CmdLineParser(options);
-			parser.parseArgument(args);
-			DropBoxManager archiver = new DropBoxManager();
-			archiver.setProxy(options);
-			archiver.getToken();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 
 	@Override
 	public String getProtocol() {
 		return "dropbox";
+	}
+
+	public static void main(String[] args) throws CmdLineException {
+		ProxyOptions options = new ProxyOptions();
+		CmdLineParser parser = new CmdLineParser(options);
+		parser.parseArgument(args);
+		DropBoxManager archiver = new DropBoxManager();
+		archiver.setProxy(options);
+		archiver.getToken();
+	}
+
+	private void getToken() {
+	    DbxAppInfo appInfo = getDbxAppInfo();
+	    DbxWebAuth auth = new DbxWebAuth(config, appInfo);
+	    DbxWebAuth.Request authRequest = DbxWebAuth.newRequestBuilder()
+	             .withNoRedirect()
+	             .build();
+        String authorizeUrl = auth.authorize(authRequest);
+        out("1. Go to: " + authorizeUrl);
+        out("2. Click \"Allow\" (you might have to log in first)");
+        out("3. Enter the authorization code there:");
+		try {
+			String code = new BufferedReader(new InputStreamReader(System.in)).readLine().trim();
+			out("Please wait ...");
+	        DbxAuthFinish authFinish = auth.finishFromCode(code);
+	        String accessToken = authFinish.getRefreshToken();
+	        out("Your token is: "+REFRESH_PREFIX+accessToken);
+	        out("Keep it in a secure place as it allows to access to your backup folder on Dropbox");
+		} catch (Exception e) {
+			err ("Sorry, an error occurred:");
+			e.printStackTrace();
+		}
+	}
+	
+	private void out(String message) {
+		System.out.println(message);
+	}
+	
+	private void err(String message) {
+		System.err.println(message);
 	}
 }

@@ -73,6 +73,7 @@ public abstract class DBSaver {
 			return destFile;
 		} catch (InterruptedException e) {
 			LoggerFactory.getLogger(getClass()).error("Backup was interrupted", e);
+			Thread.currentThread().interrupt();
 			return null;
 		}
     }
