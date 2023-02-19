@@ -10,7 +10,7 @@ import java.util.zip.GZIPOutputStream;
 final class Compressor implements Runnable {
 	private final File destFile;
 	private final ProcessContext process;
-	private volatile IOException err;
+	private IOException err;
 
 	Compressor(File destFile, ProcessContext process) {
 		this.destFile = destFile;

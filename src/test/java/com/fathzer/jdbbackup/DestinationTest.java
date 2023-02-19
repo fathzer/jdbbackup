@@ -1,32 +1,22 @@
 package com.fathzer.jdbbackup;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class DestinationTest {
+class DestinationTest {
 
 	@Test
-	public void test() {
+	void test() {
 		String path = "gkfsdjg-Sp_c/{d=yy}/photos-{d=dd-MM}";
 		String type = "dropbox";
 		Destination dest = new Destination(type+"://"+path);
 		assertEquals(type,dest.getType());
 		assertEquals(path,dest.getPath());
-	}
 
-	@Test(expected=IllegalArgumentException.class)
-	public void testEmpty() {
-		new Destination("");
-	}
-
-	@Test(expected=IllegalArgumentException.class)
-	public void testNoType() {
-		new Destination("gdfsjmlk");
-	}
-
-	@Test(expected=IllegalArgumentException.class)
-	public void testNoPath() {
-		new Destination("xxx://");
+		assertThrows(IllegalArgumentException.class, () -> new Destination(""));
+		assertThrows(IllegalArgumentException.class, () -> new Destination("gdfsjmlk"));
+		assertThrows(IllegalArgumentException.class, () -> new Destination("xxx://"));
 	}
 }

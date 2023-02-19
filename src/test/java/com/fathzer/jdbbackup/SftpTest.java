@@ -1,15 +1,15 @@
 package com.fathzer.jdbbackup;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.fathzer.jdbbackup.managers.SFTPManager;
 
-public class SftpTest {
+class SftpTest {
 
 	@Test
-	public void test() throws InvalidArgument {
+	void test() throws InvalidArgument {
 		SFTPManager m = new SFTPManager();
 		m.setDestinationPath("user:pwd@host:2222/path1/path2/filename");
 		assertEquals("user", m.getUser());
@@ -21,7 +21,7 @@ public class SftpTest {
 	}
 
 	@Test
-	public void testDefault() throws InvalidArgument {
+	void testDefault() throws InvalidArgument {
 		SFTPManager m = new SFTPManager();
 		m.setDestinationPath("user:pwd@host/filename");
 		assertEquals("user", m.getUser());
@@ -32,21 +32,14 @@ public class SftpTest {
 		assertEquals("filename.sql.gz", m.getDestFilename());
 	}
 
-	@Test (expected=InvalidArgument.class)
-	public void testNoPwd() throws InvalidArgument {
+	@Test
+	void testWrongDestPath() throws InvalidArgument {
 		SFTPManager m = new SFTPManager();
-		m.setDestinationPath("user@host/filename");
-	}
-
-	@Test (expected=InvalidArgument.class)
-	public void testNoUser() throws InvalidArgument {
-		SFTPManager m = new SFTPManager();
-		m.setDestinationPath("host/filename");
-	}
-
-	@Test (expected=InvalidArgument.class)
-	public void testNoHost() throws InvalidArgument {
-		SFTPManager m = new SFTPManager();
-		m.setDestinationPath("user:pwd/filename");
+		// Missing pwd
+		assertThrows(InvalidArgument.class, () -> m.setDestinationPath("user@host/filename"));
+		// Missing login
+		assertThrows(InvalidArgument.class, () -> m.setDestinationPath("host/filename"));
+		// Missing host
+		assertThrows(InvalidArgument.class, () -> m.setDestinationPath("user:pwd/filename"));
 	}
 }

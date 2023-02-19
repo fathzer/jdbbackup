@@ -15,10 +15,10 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<maven.compiler.target>7</maven.compiler.target>
-		<maven.compiler.source>7</maven.compiler.source>
+		<maven.compiler.target>8</maven.compiler.target>
+		<maven.compiler.source>8</maven.compiler.source>
 		<check-dependencies-java-version>${maven.compiler.target}</check-dependencies-java-version>
-		<animal-sniffer-signature>java17</animal-sniffer-signature>
+		<animal-sniffer-signature>java8</animal-sniffer-signature>
 
 		<slf-version>1.7.36</slf-version>
 		<dropbox-version>3.2.1</dropbox-version>
@@ -57,9 +57,9 @@
 			<version>${dropbox-version}</version>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.13.2</version>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.8.2</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

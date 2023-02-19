@@ -2,6 +2,7 @@ package com.fathzer.jdbbackup;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -65,8 +66,8 @@ public class JDbBackup {
 		for (Class<? extends DestinationManager> implClass : classes) {
 			DestinationManager candidate;
 			try {
-				candidate = implClass.newInstance();
-			} catch (InstantiationException | IllegalAccessException e) {
+				candidate = implClass.getConstructor().newInstance();
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				throw new RuntimeException(e);
 			}
 			if (candidate.getProtocol().equals(destination.getType())) {
