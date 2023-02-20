@@ -49,8 +49,8 @@ public class JDbBackup {
 	
 	public String backup(Options options) throws InvalidArgument, IOException {
 		try {
-			Destination destination = new Destination(options.getDestination());
-			DestinationManager manager = getDestinationManager(destination);
+			final Destination destination = new Destination(options.getDestination());
+			final DestinationManager manager = getDestinationManager(destination);
 			manager.setProxy(options);
 			File destFile = manager.setDestinationPath(destination.getPath());
 			destFile = new MySQLSaver().save(options, destFile);

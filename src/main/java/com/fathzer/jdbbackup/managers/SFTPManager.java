@@ -3,6 +3,7 @@ package com.fathzer.jdbbackup.managers;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,6 +22,8 @@ import com.jcraft.jsch.ProxyHTTP;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
+/** A destination manager that saves the backups to a sftp server.
+ */
 public class SFTPManager implements DestinationManager {
 	private String user;
 	private String password;
@@ -133,8 +136,10 @@ public class SFTPManager implements DestinationManager {
 						mkdirs(channel, destPath);
 						channel.cd(destPath);
 					}
-					channel.put(new FileInputStream(file), destFilename);
-					String fullPath = destPath==null ? destFilename : destPath+"/"+destFilename;
+					try (InputStream stream=new FileInputStream(file)) {
+						channel.put(stream, destFilename);
+					}
+					final String fullPath = destPath==null ? destFilename : destPath+"/"+destFilename;
 					return "Sent to "+user+"@"+host+": "+fullPath;
 				} catch (SftpException e) {
 					throw new IOException(e);
