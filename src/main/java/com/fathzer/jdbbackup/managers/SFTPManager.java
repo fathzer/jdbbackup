@@ -129,29 +129,33 @@ public class SFTPManager implements DestinationManager {
 			session.setConfig(config);
 			session.connect();
 			try {
-				ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
-				try {
-					channel.connect();
-					if (destPath!=null) {
-						mkdirs(channel, destPath);
-						channel.cd(destPath);
-					}
-					try (InputStream stream=new FileInputStream(file)) {
-						channel.put(stream, destFilename);
-					}
-					final String fullPath = destPath==null ? destFilename : destPath+"/"+destFilename;
-					return "Sent to "+user+"@"+host+": "+fullPath;
-				} catch (SftpException e) {
-					throw new IOException(e);
-				} finally {
-					channel.exit();
-					channel.disconnect();
-				}
+				return send(session, file);
 			} finally {
 				session.disconnect();
 			}
 		} catch (JSchException e) {
 			throw new IOException(e);
+		}
+	}
+
+	private String send(final Session session, File file) throws JSchException, IOException {
+		ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
+		channel.connect();
+		try {
+			if (destPath!=null) {
+				mkdirs(channel, destPath);
+				channel.cd(destPath);
+			}
+			try (InputStream stream=new FileInputStream(file)) {
+				channel.put(stream, destFilename);
+			}
+			final String fullPath = destPath==null ? destFilename : destPath+"/"+destFilename;
+			return "Sent to "+user+"@"+host+": "+fullPath;
+		} catch (SftpException e) {
+			throw new IOException(e);
+		} finally {
+			channel.exit();
+			channel.disconnect();
 		}
 	}
 	
