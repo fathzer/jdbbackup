@@ -29,7 +29,6 @@ public class DefaultPathDecoder implements PathDecoder {
 		StringBuilder sb = new StringBuilder();
 		int previous = 0;
 		while (m.find()) {
-//			System.out.print("From "+m.start()+" to "+m.end()+" "+content.substring(m.start(), m.end())+": ");
 			if (previous!=m.start()) {
 				sb.append(path.substring(previous, m.start()));
 			}

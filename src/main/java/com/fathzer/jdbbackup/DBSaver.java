@@ -43,9 +43,7 @@ public abstract class DBSaver {
 		final Thread compressThread = new Thread(compressor);
 		compressThread.start();
 		final InputStream err = process.getErrorStream();
-		Thread errorThread = new Thread(new Runnable(){
-			@Override
-			public void run() {
+		Thread errorThread = new Thread(() -> {
 				final Logger logger = LoggerFactory.getLogger(DBSaver.this.getClass());
 				try (BufferedReader bufErr = new BufferedReader(new InputStreamReader(err))) {
 					for (String line = bufErr.readLine(); line!=null; line = bufErr.readLine()) {
@@ -57,7 +55,7 @@ public abstract class DBSaver {
 						logger.error("Error while reading error stream", e);
 					}
 				}
-			}});
+			});
 		errorThread.start();
 		
 		try {
