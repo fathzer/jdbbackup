@@ -32,6 +32,7 @@ import com.dropbox.core.v2.files.WriteMode;
 import com.fathzer.jdbbackup.DefaultPathDecoder;
 import com.fathzer.jdbbackup.DestinationManager;
 import com.fathzer.jdbbackup.InvalidArgument;
+import com.fathzer.jdbbackup.JDbBackup;
 import com.fathzer.jdbbackup.PathDecoder;
 import com.fathzer.jdbbackup.ProxyOptions;
 
@@ -152,27 +153,19 @@ public class DropBoxManager implements DestinationManager {
 	             .withNoRedirect()
 	             .build();
         String authorizeUrl = auth.authorize(authRequest);
-        out("1. Go to: " + authorizeUrl);
-        out("2. Click \"Allow\" (you might have to log in first)");
-        out("3. Enter the authorization code there:");
+        JDbBackup.out("1. Go to: " + authorizeUrl);
+        JDbBackup.out("2. Click \"Allow\" (you might have to log in first)");
+        JDbBackup.out("3. Enter the authorization code there:");
 		try {
 			String code = new BufferedReader(new InputStreamReader(System.in)).readLine().trim();
-			out("Please wait ...");
+			JDbBackup.out("Please wait ...");
 	        DbxAuthFinish authFinish = auth.finishFromCode(code);
 	        String accessToken = authFinish.getRefreshToken();
-	        out("Your token is: "+REFRESH_PREFIX+accessToken);
-	        out("Keep it in a secure place as it allows to access to your backup folder on Dropbox");
+	        JDbBackup.out("Your token is: "+REFRESH_PREFIX+accessToken);
+	        JDbBackup.out("Keep it in a secure place as it allows to access to your backup folder on Dropbox");
 		} catch (Exception e) {
-			err ("Sorry, an error occurred:");
+			JDbBackup.err ("Sorry, an error occurred:");
 			e.printStackTrace();
 		}
-	}
-	
-	private void out(String message) {
-		System.out.println(message);
-	}
-	
-	private void err(String message) {
-		System.err.println(message);
 	}
 }

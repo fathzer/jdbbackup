@@ -21,10 +21,10 @@ public class JDbBackup {
 		try {
 			backup.doIt(args);
         } catch (InvalidArgument e) {
-            System.err.println(e.getMessage());
+            err(e.getMessage());
             // Create a new parser in order to not have currently parsed options displayed as default.
             CmdLineParser p = new CmdLineParser(new Options());
-            System.err.println("java "+JDbBackup.class.getName()+" [options...] "+getArguments(p));
+            err("java "+JDbBackup.class.getName()+" [options...] "+getArguments(p));
             // print the list of available options
             p.printUsage(System.err);
         }
@@ -40,9 +40,9 @@ public class JDbBackup {
 			throw new InvalidArgument(e);
 		}
 		try {
-			System.out.println(backup(options));
+			out(backup(options));
 		} catch (IOException e) {
-        	System.err.println("An error occurred while using arguments "+Arrays.toString(args));
+        	err("An error occurred while using arguments "+Arrays.toString(args));
         	e.printStackTrace();
         }
 	}
@@ -88,5 +88,13 @@ public class JDbBackup {
 			}
 		}
 		return builder;
+	}
+	
+	public static void out(String message) {
+		System.out.println(message);
+	}
+	
+	public static void err(String message) {
+		System.err.println(message);
 	}
 }

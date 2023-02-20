@@ -66,7 +66,7 @@ public abstract class DBSaver {
 				throw compressor.getError();
 			}
 			if (result!=0) {
-				throw new RuntimeException ("Process failed"); //TODO
+				throw new IOException ("Process failed with code "+result);
 			}
 			return destFile;
 		} catch (InterruptedException e) {
