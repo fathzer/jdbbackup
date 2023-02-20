@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.Vector;
 
 import com.fathzer.jdbbackup.DefaultPathDecoder;
 import com.fathzer.jdbbackup.DestinationManager;
@@ -118,8 +118,8 @@ public class SFTPManager implements DestinationManager {
 	@Override
 	public String send(File file) throws IOException {
 		try {
-			JSch jsch = new JSch();
-			Session session = jsch.getSession(user, host, port);
+			final JSch jsch = new JSch();
+			final Session session = jsch.getSession(user, host, port);
 			if (proxy!=null) {
 				session.setProxy(proxy);
 			}
@@ -156,30 +156,37 @@ public class SFTPManager implements DestinationManager {
 	}
 	
 	public static void mkdirs(ChannelSftp ch, String path) throws SftpException {
-		List<String> folders = new ArrayList<>(Arrays.asList(path.split("/")));
-		String fullPath;
+		final List<String> folders = new ArrayList<>(Arrays.asList(path.split("/")));
+		StringBuilder fullPath;
 		if (folders.get(0).isEmpty()) {
-			fullPath = "/";
+			// Absolute path
+			fullPath = new StringBuilder("/");
 			folders.remove(0);
 		} else {
-			fullPath = "./";
+			// Relative Path
+			fullPath = new StringBuilder("./");
 		}
 		for (String folder : folders) {
-			Vector<?> ls = ch.ls(fullPath);
-			boolean isExist = false;
-			for (Object o : ls) {
-				if (o instanceof LsEntry) {
-					LsEntry e = (LsEntry) o;
-					if (e.getAttrs().isDir() && e.getFilename().equals(folder)) {
-						isExist = true;
-					}
-				}
-			}
-			if (!isExist && !folder.isEmpty()) {
+			final Collection<?> ls = ch.ls(fullPath.toString());
+			if (!exists(ls, folder) && !folder.isEmpty()) {
 				ch.mkdir(fullPath + folder);
 			}
-			fullPath = fullPath + folder + "/";
+			fullPath.append(folder);
+			fullPath.append("/");
 		}
+	}
+
+	private static boolean exists(final Collection<?> ls, String folder) {
+		boolean isExist = false;
+		for (Object o : ls) {
+			if (o instanceof LsEntry) {
+				LsEntry e = (LsEntry) o;
+				if (e.getAttrs().isDir() && e.getFilename().equals(folder)) {
+					isExist = true;
+				}
+			}
+		}
+		return isExist;
 	}
 
 	@Override

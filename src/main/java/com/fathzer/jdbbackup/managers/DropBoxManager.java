@@ -10,6 +10,7 @@ import java.net.Authenticator;
 import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
+import java.nio.file.Files;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -81,7 +82,7 @@ public class DropBoxManager implements DestinationManager {
 		} catch (DbxException e) {
 			throw new IOException(e);
 		} finally {
-			file.delete();
+			Files.delete(file.toPath());
 		}
 	}
 	
