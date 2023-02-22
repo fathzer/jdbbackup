@@ -12,17 +12,15 @@ public class SFTPDestination {
 	private String filename;
 
 	/** Constructor.
-	 * @param fileName
+	 * @param destination The destination in its string format: <i>user:pwd@host[:port][/path]/filename</i>
 	 */
-	public SFTPDestination(String fileName) {
-		// fileName should have the following format:
-		// user:pwd@host[:port][/path]/filename
-		int index = fileName.indexOf('/');
+	public SFTPDestination(String destination) {
+		int index = destination.indexOf('/');
 		if (index < 0) {
-			badFileName(fileName);
+			badFileName(destination);
 		}
-		parseConnectionData(fileName, fileName.substring(0, index));
-		parsePath(fileName, fileName.substring(index + 1));
+		parseConnectionData(destination, destination.substring(0, index));
+		parsePath(destination, destination.substring(index + 1));
 	}
 
 	private void parseConnectionData(String fileName, String cData) throws InvalidArgumentException {

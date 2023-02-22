@@ -13,7 +13,6 @@ import com.fathzer.jdbbackup.ProxyOptions;
 
 /** A destination manager that saves the backups locally.
  * <br>It uses an instance of {@link DefaultPathDecoder} in order to build the destination path.
- * To change this behaviour, you should override the {@link #getPathDecoder()} method.
  */
 public class FileManager implements DestinationManager<Path> {
 	public FileManager() {

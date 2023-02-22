@@ -24,7 +24,7 @@ public interface DestinationManager<T> {
 	/** Sends the backup file to its final destination at the path passed in {@link #setDestinationPath}.
 	 * <br>It is guaranteed that {@link DestinationManager#setProxy(ProxyOptions)} will be called before this method.
 	 * @param file The temporary file to save
-	 * @param destination The destination that was returned by {@link #getDestination(String)}
+	 * @param destination The destination that was returned by {@link #setDestinationPath(String)}
 	 * @return a message indicating where the file was sent
 	 * @throws IOException If an error occurs while sending the file
 	 * @see #setProxy(ProxyOptions)
