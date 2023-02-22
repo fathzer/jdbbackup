@@ -14,13 +14,6 @@ public interface DestinationManager<T> {
 	 */
 	String getProtocol();
 
-	/** Gets the path decoder used to decode the path when calling {@link #setDestinationPath(String)}.
-	 * @return a path decoder.
-	 */
-	default PathDecoder getPathDecoder() {
-		return new DefaultPathDecoder();
-	}
-
 	/** Sets the destination of next backup. 
 	 * @param path The path as it is entered in the command line (example:"{d=YYYY}/baseName")
 	 * @return An internal representation of where the backup will be saved.

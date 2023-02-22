@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Default {@link PathDecoder}.
+/** A path decoder that replaces patterns with their actual value.
  * <br>It accepts patterns that have the format {<i>name</i>=<i>value</i>} where <i>name</i> is a lowercase string that identifies the kind of pattern and
  * <i>value</i> is a string that contains the pattern itself (note that the pattern can not contains '}' character.
  * <br>This class only supports one pattern kind: <b>d</b>. The <i>value</i> should be a valid date time pattern
@@ -13,9 +13,9 @@ import java.util.regex.Pattern;
  * <br>For example, the pattern {d=yyyy} should be replaced by the year on 4 characters at runtime.
  * <br>You can add your own pattern kind by overriding {@link #decode(String, String)} method.
  */
-public class DefaultPathDecoder implements PathDecoder {
+public class DefaultPathDecoder {
 	private static final Pattern PATTERN = Pattern.compile("\\{(\\p{Lower}+)=([^\\}]+)\\}");
-	public static final PathDecoder INSTANCE = new DefaultPathDecoder();
+	public static final DefaultPathDecoder INSTANCE = new DefaultPathDecoder();
 
 	/** Constructor.
 	 */
@@ -23,7 +23,11 @@ public class DefaultPathDecoder implements PathDecoder {
 		super();
 	}
 
-	@Override
+	/** Decodes a path.
+	 * @param path The encoded path
+	 * @return The decoded path
+	 * @throws IllegalNamePatternException if the path has wrong format
+	 */
 	public String decodePath(String path) throws IllegalNamePatternException {
 		Matcher m = PATTERN.matcher(path);
 		StringBuilder sb = new StringBuilder();

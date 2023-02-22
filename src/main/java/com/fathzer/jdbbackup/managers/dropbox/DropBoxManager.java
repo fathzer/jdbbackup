@@ -28,6 +28,7 @@ import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.UploadBuilder;
 import com.dropbox.core.v2.files.WriteMode;
+import com.fathzer.jdbbackup.DefaultPathDecoder;
 import com.fathzer.jdbbackup.DestinationManager;
 import com.fathzer.jdbbackup.InvalidArgumentException;
 import com.fathzer.jdbbackup.JDbBackup;
@@ -109,7 +110,7 @@ public class DropBoxManager implements DestinationManager<DropBoxManager.DropBox
 		if (!dest.path.startsWith("/")) {
 			dest.path = "/"+dest.path;
 		}
-		dest.path = getPathDecoder().decodePath(dest.path);
+		dest.path = DefaultPathDecoder.INSTANCE.decodePath(dest.path);
 		return null;
 	}
 	

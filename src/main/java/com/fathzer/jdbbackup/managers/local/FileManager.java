@@ -27,7 +27,7 @@ public class FileManager implements DestinationManager<Path> {
 
 	@Override
 	public Path setDestinationPath(String fileName) throws InvalidArgumentException {
-		return new File(getPathDecoder().decodePath(fileName)).toPath();
+		return new File(DefaultPathDecoder.INSTANCE.decodePath(fileName)).toPath();
 	}
 
 	@Override

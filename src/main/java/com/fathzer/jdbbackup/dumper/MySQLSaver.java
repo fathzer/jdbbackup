@@ -1,12 +1,14 @@
-package com.fathzer.jdbbackup;
+package com.fathzer.jdbbackup.dumper;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fathzer.jdbbackup.Options;
+
 /** A DBSaver that saves MYSQL database.
  * <br>It requires mysqldump to be installed on the machine.
  */
-public class MySQLSaver extends DBSaver {
+public class MySQLSaver extends DBSaverFromProcess {
 	@Override
 	protected List<String> getCommand(Options params, String database) {
 		List<String> commands = new ArrayList<>();

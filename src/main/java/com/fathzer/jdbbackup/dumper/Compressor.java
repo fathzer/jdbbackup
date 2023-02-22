@@ -1,4 +1,4 @@
-package com.fathzer.jdbbackup;
+package com.fathzer.jdbbackup.dumper;
 
 import java.io.File;
 import java.io.FileOutputStream;

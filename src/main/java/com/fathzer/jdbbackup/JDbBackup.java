@@ -11,6 +11,8 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.spi.OptionHandler;
 import org.reflections.Reflections;
 
+import com.fathzer.jdbbackup.dumper.MySQLSaver;
+
 public class JDbBackup {
 	public JDbBackup() {
 		super();
