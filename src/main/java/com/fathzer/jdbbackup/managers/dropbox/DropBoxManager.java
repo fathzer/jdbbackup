@@ -1,4 +1,4 @@
-package com.fathzer.jdbbackup.managers;
+package com.fathzer.jdbbackup.managers.dropbox;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,7 +10,6 @@ import java.net.Authenticator;
 import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
-import java.nio.file.Files;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -29,22 +28,23 @@ import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.UploadBuilder;
 import com.dropbox.core.v2.files.WriteMode;
-import com.fathzer.jdbbackup.DefaultPathDecoder;
 import com.fathzer.jdbbackup.DestinationManager;
-import com.fathzer.jdbbackup.InvalidArgument;
+import com.fathzer.jdbbackup.InvalidArgumentException;
 import com.fathzer.jdbbackup.JDbBackup;
-import com.fathzer.jdbbackup.PathDecoder;
 import com.fathzer.jdbbackup.ProxyOptions;
 
 /** A destination manager that saves the backups to a dropbox account.
  */
-public class DropBoxManager implements DestinationManager {
+public class DropBoxManager implements DestinationManager<DropBoxManager.DropBoxDestination> {
 	private static final String REFRESH_PREFIX = "refresh-";
 	private static final String NAME = "jDbBackup";
 	
 	private DbxRequestConfig config;
-	private String token;
-	private String path;
+
+	static class DropBoxDestination {
+		private String token;
+		private String path;
+	}
 	
 	/** Constructor.
 	 */
@@ -73,17 +73,15 @@ public class DropBoxManager implements DestinationManager {
 	}
 	
 	@Override
-	public String send(final File file) throws IOException {
-		DbxClientV2 client = new DbxClientV2(config, getCredential(token));
+	public String send(final File file, DropBoxDestination dest) throws IOException {
+		DbxClientV2 client = new DbxClientV2(config, getCredential(dest.token));
 		try (InputStream in = new FileInputStream(file)) {
-			UploadBuilder builder = client.files().uploadBuilder(path);
+			UploadBuilder builder = client.files().uploadBuilder(dest.path);
 			builder.withMode(WriteMode.OVERWRITE);
 			FileMetadata data = builder.uploadAndFinish(in, file.length());
 			return "Sent to Dropbox: "+data.getPathDisplay()+" (rev: "+data.getRev()+")";
 		} catch (DbxException e) {
 			throw new IOException(e);
-		} finally {
-			Files.delete(file.toPath());
 		}
 	}
 	
@@ -97,20 +95,21 @@ public class DropBoxManager implements DestinationManager {
 	}
 	
 	@Override
-	public File setDestinationPath(final String fileName) throws InvalidArgument {
+	public DropBoxDestination setDestinationPath(final String fileName) throws InvalidArgumentException {
 		int index = fileName.indexOf('/');
 		if (index<=0) {
-			throw new InvalidArgument("Unable to locate token. "+"FileName should conform to the format access_token/path");
+			throw new InvalidArgumentException("Unable to locate token. "+"FileName should conform to the format access_token/path");
 		}
-		this.token = fileName.substring(0, index);
-		this.path = fileName.substring(index+1);
-		if (this.path.isEmpty()) {
-			throw new InvalidArgument("Unable to locate destination path. Path should conform to the format access_token/path");
+		DropBoxDestination dest = new DropBoxDestination();
+		dest.token = fileName.substring(0, index);
+		dest.path = fileName.substring(index+1);
+		if (dest.path.isEmpty()) {
+			throw new InvalidArgumentException("Unable to locate destination path. Path should conform to the format access_token/path");
 		}
-		if (!path.startsWith("/")) {
-			path = "/"+path;
+		if (!dest.path.startsWith("/")) {
+			dest.path = "/"+dest.path;
 		}
-		path = getPathDecoder().decodePath(path);
+		dest.path = getPathDecoder().decodePath(dest.path);
 		return null;
 	}
 	
@@ -125,12 +124,6 @@ public class DropBoxManager implements DestinationManager {
 		}
 		return new DbxAppInfo(key, secret);
 	}
-	
-	@Override
-	public PathDecoder getPathDecoder() {
-		return new DefaultPathDecoder();
-	}
-
 
 	@Override
 	public String getProtocol() {

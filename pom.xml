@@ -6,7 +6,7 @@
 		<version>1.0.5</version>
 	</parent>
 	<artifactId>jdbbackup</artifactId>
-	<version>0.0.3</version>
+	<version>1.0.0</version>
 	<description>A simple java library to perform db backup stored in dropbox, sftp or local file</description>
 	<scm>
 		<url>https://github.com/fathzer/jdbbackup.git</url>

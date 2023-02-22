@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.InterruptedIOException;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -21,10 +22,10 @@ public abstract class DBSaver {
 	/** Saves a database to the specified location.
 	 * @param params The parameters to access to database to save 
 	 * @param destFile the backup destination file or null to backup database in a temporary file.
-	 * @return The file where database has been saved.
+	 * @return The file where database has been saved or null if the backup was interrupted.
 	 * @throws IOException If something went wrong
 	 */
-	public File save(Options params, File destFile) throws IOException {
+	public void save(Options params, File destFile) throws IOException {
 		final List<String> commands = getCommand(params, params.getDbName());
 
 		final ProcessBuilder pb = new ProcessBuilder(commands);
@@ -68,11 +69,10 @@ public abstract class DBSaver {
 			if (result!=0) {
 				throw new IOException ("Process failed with code "+result);
 			}
-			return destFile;
 		} catch (InterruptedException e) {
-			LoggerFactory.getLogger(getClass()).error("Backup was interrupted", e);
+			LoggerFactory.getLogger(getClass()).warn("Backup was interrupted", e);
 			Thread.currentThread().interrupt();
-			return null;
+			throw new InterruptedIOException();
 		}
     }
 

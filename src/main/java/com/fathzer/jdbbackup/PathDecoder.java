@@ -6,7 +6,7 @@ public interface PathDecoder {
 	/** Decodes a path.
 	 * @param path The encoded path
 	 * @return The decoded path
-	 * @throws IllegalNamePattern if the path has wrong format
+	 * @throws IllegalNamePatternException if the path has wrong format
 	 */
-	String decodePath(String path) throws IllegalNamePattern;
+	String decodePath(String path) throws IllegalNamePatternException;
 }

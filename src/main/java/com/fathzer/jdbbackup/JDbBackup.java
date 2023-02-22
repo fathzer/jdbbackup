@@ -2,7 +2,7 @@ package com.fathzer.jdbbackup;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -20,7 +20,7 @@ public class JDbBackup {
 		JDbBackup backup = new JDbBackup();
 		try {
 			backup.doIt(args);
-        } catch (InvalidArgument e) {
+        } catch (InvalidArgumentException e) {
             err(e.getMessage());
             // Create a new parser in order to not have currently parsed options displayed as default.
             CmdLineParser p = new CmdLineParser(new Options());
@@ -30,14 +30,14 @@ public class JDbBackup {
         }
 	}
 
-	private void doIt(String[] args) throws InvalidArgument {
+	private void doIt(String[] args) throws InvalidArgumentException {
 		Options options = new Options();
 		CmdLineParser parser = new CmdLineParser(options);
 		try {
 			// parse the arguments.
 			parser.parseArgument(args);
 		} catch(CmdLineException e) {
-			throw new InvalidArgument(e);
+			throw new InvalidArgumentException(e);
 		}
 		try {
 			out(backup(options));
@@ -47,34 +47,46 @@ public class JDbBackup {
         }
 	}
 	
-	public String backup(Options options) throws InvalidArgument, IOException {
+	public String backup(Options options) throws InvalidArgumentException, IOException {
+		final Destination destination = new Destination(options.getDestination());
+		final DestinationManager<?> manager = getDestinationManager(destination);
+		final File tmpFile = File.createTempFile("DBDump", ".gz");
 		try {
-			final Destination destination = new Destination(options.getDestination());
-			final DestinationManager manager = getDestinationManager(destination);
-			manager.setProxy(options);
-			File destFile = manager.setDestinationPath(destination.getPath());
-			destFile = new MySQLSaver().save(options, destFile);
-			return destFile==null ? null : manager.send(destFile);
-		} catch (IllegalArgumentException e) {
-			throw new InvalidArgument(e.getMessage());
+			tmpFile.deleteOnExit();
+			return backup(options, manager, destination, tmpFile);
+		} finally {
+			Files.delete(tmpFile.toPath());
 		}
 	}
 	
-	private DestinationManager getDestinationManager(Destination destination) throws InvalidArgument {
-		Reflections reflections = new Reflections("");
-		Set<Class<? extends DestinationManager>> classes = reflections.getSubTypesOf(DestinationManager.class);
+	private <T> String backup(Options options, DestinationManager<T> manager, Destination destination, File tmpFile) throws InvalidArgumentException, IOException {
+		try {
+			manager.setProxy(options);
+			T destFile = manager.setDestinationPath(destination.getPath());
+			new MySQLSaver().save(options, tmpFile);
+			return manager.send(tmpFile, destFile);
+		} catch (IllegalArgumentException e) {
+			throw new InvalidArgumentException(e.getMessage());
+		}
+		
+	}
+	
+	private DestinationManager<?> getDestinationManager(Destination destination) throws InvalidArgumentException {
+		final Reflections reflections = new Reflections("");
+		
+		final Set<Class<? extends DestinationManager>> classes = reflections.getSubTypesOf(DestinationManager.class);
 		for (Class<? extends DestinationManager> implClass : classes) {
-			DestinationManager candidate;
+			final DestinationManager<?> candidate;
 			try {
 				candidate = implClass.getConstructor().newInstance();
-			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-				throw new RuntimeException(e);
+			} catch (ReflectiveOperationException e) {
+				throw new DestinationManagerInstantiationException(e);
 			}
 			if (candidate.getProtocol().equals(destination.getType())) {
 				return candidate;
 			}
 		}
-		throw new InvalidArgument("Unknown protocol: "+destination.getType());
+		throw new InvalidArgumentException("Unknown protocol: "+destination.getType());
 	}
 
 	private static CharSequence getArguments(CmdLineParser parser) {

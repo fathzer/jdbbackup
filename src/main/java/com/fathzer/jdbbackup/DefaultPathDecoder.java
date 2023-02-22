@@ -24,7 +24,7 @@ public class DefaultPathDecoder implements PathDecoder {
 	}
 
 	@Override
-	public String decodePath(String path) throws IllegalNamePattern {
+	public String decodePath(String path) throws IllegalNamePatternException {
 		Matcher m = PATTERN.matcher(path);
 		StringBuilder sb = new StringBuilder();
 		int previous = 0;
@@ -53,17 +53,17 @@ public class DefaultPathDecoder implements PathDecoder {
 	 * @param name The pattern name.
 	 * @param value The pattern value.
 	 * @return The decoded pattern.
-	 * @throws IllegalNamePattern If the name in not a valid name or value is not a wlid valid for <i>name</i> pattern.
+	 * @throws IllegalNamePatternException If the name in not a valid name or value is not a wlid valid for <i>name</i> pattern.
 	 */
-	protected CharSequence decode(String name, String value) throws IllegalNamePattern {
+	protected CharSequence decode(String name, String value) throws IllegalNamePatternException {
 		if ("d".equals(name)) {
 			try {
 				return new SimpleDateFormat(value).format(new Date());
 			} catch (IllegalArgumentException e) {
-				throw new IllegalNamePattern(value+" is not a valid value for "+name+" pattern");
+				throw new IllegalNamePatternException(value+" is not a valid value for "+name+" pattern");
 			}
 		} else {
-			throw new IllegalNamePattern(name+" is not a valid pattern name");
+			throw new IllegalNamePatternException(name+" is not a valid pattern name");
 		}
 	}
 }
