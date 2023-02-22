@@ -1,6 +1,6 @@
 package com.fathzer.jdbbackup;
 
-public class Destination {
+class Destination {
 	private String type;
 	private String path;
 	

@@ -47,7 +47,6 @@ public abstract class DBSaverFromProcess implements DBSaver {
 				}
 			});
 		errorThread.start();
-		
 		try {
 			final int result = process.waitFor();
 			compressThread.join();

@@ -5,13 +5,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.spi.OptionHandler;
 import org.reflections.Reflections;
-
-import com.fathzer.jdbbackup.dumper.MySQLSaver;
 
 public class JDbBackup {
 	public JDbBackup() {
@@ -65,30 +64,45 @@ public class JDbBackup {
 		try {
 			manager.setProxy(options);
 			T destFile = manager.setDestinationPath(destination.getPath());
-			new MySQLSaver().save(options, tmpFile);
+			getDBSaver(options.getDbType()).save(options, tmpFile);
 			return manager.send(tmpFile, destFile);
 		} catch (IllegalArgumentException e) {
 			throw new InvalidArgumentException(e.getMessage());
 		}
-		
 	}
 	
-	private DestinationManager<?> getDestinationManager(Destination destination) throws InvalidArgumentException {
+	protected <T> DestinationManager<T> getDestinationManager(Destination destination) throws InvalidArgumentException {
+		@SuppressWarnings("unchecked")
+		final DestinationManager<T> manager = findClass(DestinationManager.class, c -> c.getProtocol().equals(destination.getType()));
+		if (manager==null) {
+			throw new InvalidArgumentException("Unknown protocol: "+destination.getType());
+		}
+		return manager;
+	}
+	
+	protected DBSaver getDBSaver(String dbType) throws InvalidArgumentException {
+		final DBSaver saver = findClass(DBSaver.class, c -> c.getDBType().equals(dbType));
+		if (saver==null) {
+			throw new InvalidArgumentException("Unknown database type: "+dbType);
+		}
+		return saver;
+	}
+
+	private <T> T findClass(Class<T> aClass, Predicate<T> filter) {
 		final Reflections reflections = new Reflections("");
-		
-		final Set<Class<? extends DestinationManager>> classes = reflections.getSubTypesOf(DestinationManager.class);
-		for (Class<? extends DestinationManager> implClass : classes) {
-			final DestinationManager<?> candidate;
+		final Set<Class<? extends T>> classes = reflections.getSubTypesOf(aClass);
+		for (Class<? extends T> implClass : classes) {
+			final T candidate;
 			try {
 				candidate = implClass.getConstructor().newInstance();
 			} catch (ReflectiveOperationException e) {
 				throw new DestinationManagerInstantiationException(e);
 			}
-			if (candidate.getProtocol().equals(destination.getType())) {
+			if (filter.test(candidate)) {
 				return candidate;
 			}
 		}
-		throw new InvalidArgumentException("Unknown protocol: "+destination.getType());
+		return null;
 	}
 
 	private static CharSequence getArguments(CmdLineParser parser) {

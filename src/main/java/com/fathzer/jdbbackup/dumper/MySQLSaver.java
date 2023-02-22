@@ -23,4 +23,9 @@ public class MySQLSaver extends DBSaverFromProcess {
 		commands.add(database);
 		return commands;
 	}
+
+	@Override
+	public String getDBType() {
+		return "mysql";
+	}
 }

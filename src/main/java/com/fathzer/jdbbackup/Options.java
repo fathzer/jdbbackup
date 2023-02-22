@@ -4,6 +4,9 @@ import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
 public class Options extends ProxyOptions {
+    @Option(name = "-db", metaVar="dbType", usage = "Data base type")
+    private String dbType="mysql";
+
     @Option(name = "-h", metaVar="dbHost", usage = "Data base server host name")
     private String dbHost="127.0.0.1";
 
@@ -28,6 +31,10 @@ public class Options extends ProxyOptions {
 
 	public String getDestination() {
 		return dest;
+	}
+	
+	public String getDbType() {
+		return dbType;
 	}
 
 	public String getDbHost() {
