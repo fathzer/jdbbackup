@@ -10,7 +10,7 @@ import com.fathzer.jdbbackup.Options;
  */
 public class MySQLSaver extends DBSaverFromProcess {
 	@Override
-	protected List<String> getCommand(Options params, String database) {
+	protected List<String> getCommand(Options params) {
 		List<String> commands = new ArrayList<>();
 		commands.add("mysqldump");
 		commands.add("--host="+params.getDbHost());
@@ -20,7 +20,7 @@ public class MySQLSaver extends DBSaverFromProcess {
 			commands.add("--password="+params.getDbPwd());
 		}
 		commands.add("--add-drop-database");
-		commands.add(database);
+		commands.add(params.getDbName());
 		return commands;
 	}
 

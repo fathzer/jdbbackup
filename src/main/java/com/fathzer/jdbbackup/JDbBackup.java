@@ -2,6 +2,7 @@ package com.fathzer.jdbbackup;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Set;
@@ -89,17 +90,19 @@ public class JDbBackup {
 	}
 
 	private <T> T findClass(Class<T> aClass, Predicate<T> filter) {
-		final Reflections reflections = new Reflections("");
+		final Reflections reflections = new Reflections("com.fathzer.jdbbackup");
 		final Set<Class<? extends T>> classes = reflections.getSubTypesOf(aClass);
 		for (Class<? extends T> implClass : classes) {
-			final T candidate;
-			try {
-				candidate = implClass.getConstructor().newInstance();
-			} catch (ReflectiveOperationException e) {
-				throw new DestinationManagerInstantiationException(e);
-			}
-			if (filter.test(candidate)) {
-				return candidate;
+			if (!Modifier.isAbstract(implClass.getModifiers())) {
+				final T candidate;
+				try {
+					candidate = implClass.getConstructor().newInstance();
+				} catch (ReflectiveOperationException e) {
+					throw new DestinationManagerInstantiationException(e);
+				}
+				if (filter.test(candidate)) {
+					return candidate;
+				}
 			}
 		}
 		return null;

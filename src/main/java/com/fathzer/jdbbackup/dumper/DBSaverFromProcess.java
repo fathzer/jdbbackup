@@ -24,7 +24,7 @@ public abstract class DBSaverFromProcess implements DBSaver {
 	
 	@Override
 	public void save(Options params, File destFile) throws IOException {
-		final List<String> commands = getCommand(params, params.getDbName());
+		final List<String> commands = getCommand(params);
 
 		final ProcessBuilder pb = new ProcessBuilder(commands);
 		final Process process = pb.start();
@@ -66,8 +66,7 @@ public abstract class DBSaverFromProcess implements DBSaver {
 
 	/** Gets the command line to execute to save the database.
 	 * @param params The database access parameters
-	 * @param database The name of the database
 	 * @return The list of the tokens that compose the command 
 	 */
-	protected abstract List<String> getCommand(Options params, String database);
+	protected abstract List<String> getCommand(Options params);
 }

@@ -22,7 +22,7 @@ public class Options extends ProxyOptions {
     @Option(name = "-pwd", metaVar="dbPassword", usage = "Data base user password")
     private String dbPwd;
 
-    @Argument(index = 1, metaVar="dest", usage ="Destination", required=true)
+    @Argument(index = 1, metaVar="dest", usage ="Destination (example sftp://user:pwd@host/filepath)", required=true)
     private String dest;
 
 	public String getDbName() {
