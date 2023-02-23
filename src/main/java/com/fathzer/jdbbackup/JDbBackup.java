@@ -22,7 +22,7 @@ public class JDbBackup {
 		JDbBackup backup = new JDbBackup();
 		try {
 			backup.doIt(args);
-        } catch (InvalidArgumentException e) {
+        } catch (IllegalArgumentException e) {
             err(e.getMessage());
             // Create a new parser in order to not have currently parsed options displayed as default.
             CmdLineParser p = new CmdLineParser(new Options());
@@ -32,14 +32,14 @@ public class JDbBackup {
         }
 	}
 
-	private void doIt(String[] args) throws InvalidArgumentException {
+	private void doIt(String[] args) {
 		Options options = new Options();
 		CmdLineParser parser = new CmdLineParser(options);
 		try {
 			// parse the arguments.
 			parser.parseArgument(args);
 		} catch(CmdLineException e) {
-			throw new InvalidArgumentException(e);
+			throw new IllegalArgumentException(e);
 		}
 		try {
 			out(backup(options));
@@ -49,42 +49,43 @@ public class JDbBackup {
         }
 	}
 	
-	public String backup(Options options) throws InvalidArgumentException, IOException {
+	public String backup(Options options) throws IOException {
 		final Destination destination = new Destination(options.getDestination());
 		final DestinationManager<?> manager = getDestinationManager(destination);
-		final File tmpFile = File.createTempFile("DBDump", ".gz");
+		final File tmpFile = createTempFile();
 		try {
-			tmpFile.deleteOnExit();
 			return backup(options, manager, destination, tmpFile);
 		} finally {
 			Files.delete(tmpFile.toPath());
 		}
 	}
 	
-	private <T> String backup(Options options, DestinationManager<T> manager, Destination destination, File tmpFile) throws InvalidArgumentException, IOException {
-		try {
-			manager.setProxy(options);
-			T destFile = manager.setDestinationPath(destination.getPath());
-			getDBSaver(options.getDbType()).save(options, tmpFile);
-			return manager.send(tmpFile, destFile);
-		} catch (IllegalArgumentException e) {
-			throw new InvalidArgumentException(e.getMessage());
-		}
+	protected File createTempFile() throws IOException {
+		final File tmpFile = File.createTempFile("DBDump", ".gz");
+		tmpFile.deleteOnExit();
+		return tmpFile;
 	}
 	
-	protected <T> DestinationManager<T> getDestinationManager(Destination destination) throws InvalidArgumentException {
+	private <T> String backup(Options options, DestinationManager<T> manager, Destination destination, File tmpFile) throws IOException {
+		manager.setProxy(options);
+		T destFile = manager.setDestinationPath(destination.getPath());
+		getDBSaver(options.getDbType()).save(options, tmpFile);
+		return manager.send(tmpFile, destFile);
+	}
+	
+	protected <T> DestinationManager<T> getDestinationManager(Destination destination) {
 		@SuppressWarnings("unchecked")
 		final DestinationManager<T> manager = findClass(DestinationManager.class, c -> c.getProtocol().equals(destination.getType()));
 		if (manager==null) {
-			throw new InvalidArgumentException("Unknown protocol: "+destination.getType());
+			throw new IllegalArgumentException("Unknown protocol: "+destination.getType());
 		}
 		return manager;
 	}
 	
-	protected DBSaver getDBSaver(String dbType) throws InvalidArgumentException {
+	protected DBSaver getDBSaver(String dbType) {
 		final DBSaver saver = findClass(DBSaver.class, c -> c.getDBType().equals(dbType));
 		if (saver==null) {
-			throw new InvalidArgumentException("Unknown database type: "+dbType);
+			throw new IllegalArgumentException("Unknown database type: "+dbType);
 		}
 		return saver;
 	}

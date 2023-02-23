@@ -5,6 +5,9 @@ class Destination {
 	private String path;
 	
 	public Destination(String dest) {
+		if (dest==null) {
+			throw new IllegalArgumentException();
+		}
 		int index = dest.indexOf(':');
 		if (index<=0) {
 			throw new IllegalArgumentException ("Destination type is missing in "+dest);

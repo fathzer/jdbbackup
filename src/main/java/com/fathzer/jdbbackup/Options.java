@@ -61,6 +61,10 @@ public class Options extends ProxyOptions {
 		this.dest = destination;
 	}
 
+	public void setDbType(String dbType) {
+		this.dbType = dbType;
+	}
+
 	public void setDbHost(String dbHost) {
 		this.dbHost = dbHost;
 	}

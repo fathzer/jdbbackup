@@ -8,7 +8,6 @@ import java.nio.file.StandardCopyOption;
 
 import com.fathzer.jdbbackup.DefaultPathDecoder;
 import com.fathzer.jdbbackup.DestinationManager;
-import com.fathzer.jdbbackup.InvalidArgumentException;
 import com.fathzer.jdbbackup.ProxyOptions;
 
 /** A destination manager that saves the backups locally.
@@ -25,7 +24,7 @@ public class FileManager implements DestinationManager<Path> {
 	}
 
 	@Override
-	public Path setDestinationPath(String fileName) throws InvalidArgumentException {
+	public Path setDestinationPath(String fileName) {
 		return new File(DefaultPathDecoder.INSTANCE.decodePath(fileName)).toPath();
 	}
 

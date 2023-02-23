@@ -11,12 +11,15 @@ import com.fathzer.jdbbackup.Options;
 public class MySQLSaver extends DBSaverFromProcess {
 	@Override
 	protected List<String> getCommand(Options params) {
-		List<String> commands = new ArrayList<>();
+		if (isEmpty(params.getDbName()) || isEmpty(params.getDbHost()) || params.getDbPort()<=0 || isEmpty(params.getDbUser())) {
+			throw new IllegalArgumentException("Invalid parameters");
+		}
+		final List<String> commands = new ArrayList<>();
 		commands.add("mysqldump");
 		commands.add("--host="+params.getDbHost());
 		commands.add("--port="+params.getDbPort());
 		commands.add("--user="+params.getDbUser());
-		if (params.getDbPwd()!=null && !params.getDbPwd().isEmpty()) {
+		if (!isEmpty(params.getDbPwd())) {
 			commands.add("--password="+params.getDbPwd());
 		}
 		commands.add("--add-drop-database");
@@ -27,5 +30,9 @@ public class MySQLSaver extends DBSaverFromProcess {
 	@Override
 	public String getDBType() {
 		return "mysql";
+	}
+	
+	private boolean isEmpty(String str) {
+		return str==null || str.trim().isEmpty();
 	}
 }

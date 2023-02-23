@@ -11,24 +11,25 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
 
 import com.fathzer.jdbbackup.DBSaver;
-import com.fathzer.jdbbackup.InvalidArgumentException;
 import com.fathzer.jdbbackup.JDbBackup;
 
 class DBSaverTest {
 
 	static class CoolJDBackup extends JDbBackup {
 		@Override
-		public DBSaver getDBSaver(String dbType) throws InvalidArgumentException {
+		public DBSaver getDBSaver(String dbType) {
 			return super.getDBSaver(dbType);
 		}
 	}
 
 	@Test
-	@EnabledIf("com.fathzer.jdbbackup.JavaProcessAvailabilityChecker#available")
+//	@EnabledIf("com.fathzer.jdbbackup.JavaProcessAvailabilityChecker#available")
+	@Disabled("Replace by JDbBackupTest")
 	void test() throws IOException {
 		CoolJDBackup b = new CoolJDBackup();
 		FakeJavaSaver s = (FakeJavaSaver) b.getDBSaver(new FakeJavaSaver().getDBType());

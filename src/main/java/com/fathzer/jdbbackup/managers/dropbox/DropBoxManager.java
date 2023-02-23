@@ -30,7 +30,6 @@ import com.dropbox.core.v2.files.UploadBuilder;
 import com.dropbox.core.v2.files.WriteMode;
 import com.fathzer.jdbbackup.DefaultPathDecoder;
 import com.fathzer.jdbbackup.DestinationManager;
-import com.fathzer.jdbbackup.InvalidArgumentException;
 import com.fathzer.jdbbackup.JDbBackup;
 import com.fathzer.jdbbackup.ProxyOptions;
 
@@ -96,16 +95,16 @@ public class DropBoxManager implements DestinationManager<DropBoxManager.DropBox
 	}
 	
 	@Override
-	public DropBoxDestination setDestinationPath(final String fileName) throws InvalidArgumentException {
+	public DropBoxDestination setDestinationPath(final String fileName) {
 		int index = fileName.indexOf('/');
 		if (index<=0) {
-			throw new InvalidArgumentException("Unable to locate token. "+"FileName should conform to the format access_token/path");
+			throw new IllegalArgumentException("Unable to locate token. "+"FileName should conform to the format access_token/path");
 		}
 		DropBoxDestination dest = new DropBoxDestination();
 		dest.token = fileName.substring(0, index);
 		dest.path = fileName.substring(index+1);
 		if (dest.path.isEmpty()) {
-			throw new InvalidArgumentException("Unable to locate destination path. Path should conform to the format access_token/path");
+			throw new IllegalArgumentException("Unable to locate destination path. Path should conform to the format access_token/path");
 		}
 		if (!dest.path.startsWith("/")) {
 			dest.path = "/"+dest.path;

@@ -17,9 +17,9 @@ public interface DestinationManager<T> {
 	/** Sets the destination of next backup. 
 	 * @param path The path as it is entered in the command line (example:"{d=YYYY}/baseName")
 	 * @return An internal representation of where the backup will be saved.
-	 * @throws InvalidArgumentException If the path is not valid.
+	 * @throws IllegalArgumentException If the path is not valid.
 	 */
-	T setDestinationPath(final String path) throws InvalidArgumentException;
+	T setDestinationPath(final String path);
 	
 	/** Sends the backup file to its final destination at the path passed in {@link #setDestinationPath}.
 	 * <br>It is guaranteed that {@link DestinationManager#setProxy(ProxyOptions)} will be called before this method.

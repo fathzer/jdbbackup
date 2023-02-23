@@ -9,7 +9,7 @@ import com.fathzer.jdbbackup.managers.sftp.SFTPDestination;
 class SftpTest {
 
 	@Test
-	void test() throws InvalidArgumentException {
+	void test() {
 		SFTPDestination m = new SFTPDestination("user:pwd@host:2222/path1/path2/filename");
 		assertEquals("user", m.getUser());
 		assertEquals("pwd", m.getPassword());
@@ -20,7 +20,7 @@ class SftpTest {
 	}
 
 	@Test
-	void testDefault() throws InvalidArgumentException {
+	void testDefault() {
 		SFTPDestination m = new SFTPDestination("user:pwd@host/filename");
 		assertEquals("user", m.getUser());
 		assertEquals("pwd", m.getPassword());
@@ -31,12 +31,12 @@ class SftpTest {
 	}
 
 	@Test
-	void testWrongDestPath() throws InvalidArgumentException {
+	void testWrongDestPath() {
 		// Missing pwd
-		assertThrows(InvalidArgumentException.class, () -> new SFTPDestination("user@host/filename"));
+		assertThrows(IllegalArgumentException.class, () -> new SFTPDestination("user@host/filename"));
 		// Missing login
-		assertThrows(InvalidArgumentException.class, () -> new SFTPDestination("host/filename"));
+		assertThrows(IllegalArgumentException.class, () -> new SFTPDestination("host/filename"));
 		// Missing host
-		assertThrows(InvalidArgumentException.class, () -> new SFTPDestination("user:pwd/filename"));
+		assertThrows(IllegalArgumentException.class, () -> new SFTPDestination("user:pwd/filename"));
 	}
 }

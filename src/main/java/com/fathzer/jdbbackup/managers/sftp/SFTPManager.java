@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.List;
 
 import com.fathzer.jdbbackup.DestinationManager;
-import com.fathzer.jdbbackup.InvalidArgumentException;
 import com.fathzer.jdbbackup.ProxyOptions;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
@@ -41,7 +40,7 @@ public class SFTPManager implements DestinationManager<SFTPDestination> {
 	}
 
 	@Override
-	public SFTPDestination setDestinationPath(String fileName) throws InvalidArgumentException {
+	public SFTPDestination setDestinationPath(String fileName) {
 		return new SFTPDestination(fileName);
 	}
 

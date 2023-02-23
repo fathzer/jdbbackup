@@ -1,7 +1,6 @@
 package com.fathzer.jdbbackup.managers.sftp;
 
 import com.fathzer.jdbbackup.DefaultPathDecoder;
-import com.fathzer.jdbbackup.InvalidArgumentException;
 
 public class SFTPDestination {
 	private String user;
@@ -23,7 +22,7 @@ public class SFTPDestination {
 		parsePath(destination, destination.substring(index + 1));
 	}
 
-	private void parseConnectionData(String fileName, String cData) throws InvalidArgumentException {
+	private void parseConnectionData(String fileName, String cData) {
 		int index = cData.indexOf('@');
 		if (index < 0) {
 			badFileName(fileName);
@@ -32,7 +31,7 @@ public class SFTPDestination {
 		parseHostData(fileName, cData.substring(index + 1));
 	}
 
-	private void parseUserData(String fileName, String userData) throws InvalidArgumentException {
+	private void parseUserData(String fileName, String userData) {
 		int index = userData.indexOf(':');
 		if (index < 0) {
 			badFileName(fileName);
@@ -41,7 +40,7 @@ public class SFTPDestination {
 		this.password = userData.substring(index + 1);
 	}
 
-	private void parseHostData(String fileName, String hostData) throws InvalidArgumentException {
+	private void parseHostData(String fileName, String hostData) {
 		if (hostData.isEmpty()) {
 			this.host = "127.0.0.1";
 			this.port = 22;
@@ -61,7 +60,7 @@ public class SFTPDestination {
 		}
 	}
 
-	private void parsePath(String fileName, String path) throws InvalidArgumentException {
+	private void parsePath(String fileName, String path) {
 		path = DefaultPathDecoder.INSTANCE.decodePath(path);
 		int index = path.lastIndexOf('/');
 		if (index < 0) {
@@ -75,9 +74,8 @@ public class SFTPDestination {
 		}
 	}
 
-	private void badFileName(String fileName) throws InvalidArgumentException {
-		throw new InvalidArgumentException(
-				fileName + " does not match format user:pwd@host[:port][/path]/filename");
+	private void badFileName(String fileName) {
+		throw new IllegalArgumentException(fileName + " does not match format user:pwd@host[:port][/path]/filename");
 	}
 
 	public String getUser() {

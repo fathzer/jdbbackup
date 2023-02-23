@@ -66,7 +66,8 @@ public abstract class DBSaverFromProcess implements DBSaver {
 
 	/** Gets the command line to execute to save the database.
 	 * @param params The database access parameters
-	 * @return The list of the tokens that compose the command 
+	 * @return The list of the tokens that compose the command
+	 * @throws IllegalArgumentException if Options are invalid 
 	 */
 	protected abstract List<String> getCommand(Options params);
 }
