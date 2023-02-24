@@ -21,6 +21,7 @@ import com.dropbox.core.DbxAuthFinish;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.DbxWebAuth;
+import com.dropbox.core.TokenAccessType;
 import com.dropbox.core.http.StandardHttpRequestor;
 import com.dropbox.core.http.StandardHttpRequestor.Config;
 import com.dropbox.core.oauth.DbxCredential;
@@ -34,6 +35,7 @@ import com.fathzer.jdbbackup.JDbBackup;
 import com.fathzer.jdbbackup.ProxyOptions;
 
 /** A destination manager that saves the backups to a dropbox account.
+ * <br>Destination paths have the foolowing format dropbox:<i>token</i>/<i>fileName</i>
  */
 public class DropBoxManager implements DestinationManager<DropBoxManager.DropBoxDestination> {
 	private static final String REFRESH_PREFIX = "refresh-";
@@ -110,7 +112,7 @@ public class DropBoxManager implements DestinationManager<DropBoxManager.DropBox
 			dest.path = "/"+dest.path;
 		}
 		dest.path = DefaultPathDecoder.INSTANCE.decodePath(dest.path);
-		return null;
+		return dest;
 	}
 	
 	private static DbxAppInfo getDbxAppInfo() {
@@ -144,6 +146,7 @@ public class DropBoxManager implements DestinationManager<DropBoxManager.DropBox
 	    DbxWebAuth auth = new DbxWebAuth(config, appInfo);
 	    DbxWebAuth.Request authRequest = DbxWebAuth.newRequestBuilder()
 	             .withNoRedirect()
+	             .withTokenAccessType(TokenAccessType.OFFLINE)
 	             .build();
         String authorizeUrl = auth.authorize(authRequest);
         JDbBackup.out("1. Go to: " + authorizeUrl);

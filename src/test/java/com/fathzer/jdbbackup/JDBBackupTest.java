@@ -71,4 +71,15 @@ class JDBBackupTest {
 		o.setDbType(new FakeJavaSaver().getDBType());
 		assertThrows(IOException.class, () -> b.backup(o));
 	}
+
+	@Test
+	@EnabledIf("com.fathzer.jdbbackup.JavaProcessAvailabilityChecker#available")
+	void testDropbox() throws IOException {
+		final ObservableJDbBackup b = new ObservableJDbBackup();
+		final Options o = new Options();
+		o.setDestination("dropbox://"+"refresh-FvDoHXhqlHsAAAAAAAAAASGS2_hcq8Jxf1wnkYoaLwtqRkkD0JtAZfyOVmxfbtdX/testJM");
+		FakeJavaSaver.shouldFail = false;
+		o.setDbType(new FakeJavaSaver().getDBType());
+		b.backup(o);
+	}
 }
