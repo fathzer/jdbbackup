@@ -37,7 +37,7 @@ class JDBBackupTest {
 
 	@Test
 	@EnabledIf("com.fathzer.jdbbackup.JavaProcessAvailabilityChecker#available")
-	void test() throws IOException {
+	void testOk() throws IOException {
 		final ObservableJDbBackup b = new ObservableJDbBackup();
 		final Options o = new Options();
 		// No destination
@@ -49,7 +49,7 @@ class JDBBackupTest {
 		assertThrows(IllegalArgumentException.class, () -> b.backup(o));
 		assertTrue(b.tmpFile==null || !b.tmpFile.exists());
 		
-		
+		FakeJavaSaver.shouldFail = false;
 		o.setDbType(new FakeJavaSaver().getDBType());
 		b.backup(o);
 		assertTrue(b.tmpFile==null || !b.tmpFile.exists());
@@ -59,7 +59,16 @@ class JDBBackupTest {
 			final List<String> lines = reader.lines().collect(Collectors.toList());
 			assertEquals(FakeJavaSaver.CONTENT, lines);
 		}
-
 	}
 
+	@Test
+	@EnabledIf("com.fathzer.jdbbackup.JavaProcessAvailabilityChecker#available")
+	void testKo() throws IOException {
+		final ObservableJDbBackup b = new ObservableJDbBackup();
+		final Options o = new Options();
+		o.setDestination("file://"+DEST_PATH);
+		FakeJavaSaver.shouldFail = true;
+		o.setDbType(new FakeJavaSaver().getDBType());
+		assertThrows(IOException.class, () -> b.backup(o));
+	}
 }

@@ -8,7 +8,7 @@ import com.fathzer.jdbbackup.Options;
 
 public final class FakeJavaSaver extends DBSaverFromProcess {
 	public static final List<String> CONTENT = Arrays.asList("Hello,","This is a fake db dump");
-	boolean shouldFail;
+	public static boolean shouldFail;
 	@Override
 	public String getDBType() {
 		return "java";
