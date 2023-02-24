@@ -6,12 +6,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.net.Authenticator;
 import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
 import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.Properties;
+import java.util.function.Supplier;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -35,11 +37,25 @@ import com.fathzer.jdbbackup.JDbBackup;
 import com.fathzer.jdbbackup.ProxyOptions;
 
 /** A destination manager that saves the backups to a dropbox account.
- * <br>Destination paths have the foolowing format dropbox:<i>token</i>/<i>fileName</i>
+ * <br>Destination paths have the foolowing format dropbox://<i>token</i>/<i>fileName</i>
  */
 public class DropBoxManager implements DestinationManager<DropBoxManager.DropBoxDestination> {
 	private static final String REFRESH_PREFIX = "refresh-";
 	private static final String NAME = "jDbBackup";
+	private static Supplier<DbxAppInfo> dbxAppInfoProvider = () -> {
+		try (InputStream in = DropBoxManager.class.getResourceAsStream("keys.properties")) {
+			final Properties properties = new Properties();
+			properties.load(in);
+			String key = properties.getProperty("appKey");
+			String secret = properties.getProperty("appSecret");
+			if (key.length()==0 || secret.length()==0) {
+				throw new MissingResourceException("App key and secret not provided","","");
+			}
+			return new DbxAppInfo(key, secret);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	};
 	
 	private DbxRequestConfig config;
 
@@ -89,7 +105,7 @@ public class DropBoxManager implements DestinationManager<DropBoxManager.DropBox
 	
 	private DbxCredential getCredential(String token) {
 		if (token.startsWith(REFRESH_PREFIX)) {
-			final DbxAppInfo info = getDbxAppInfo();
+			final DbxAppInfo info = dbxAppInfoProvider.get();
 			return new DbxCredential("fake", 0L, token.substring(REFRESH_PREFIX.length()), info.getKey(), info.getSecret());
 		} else {
 			return new DbxCredential(token);
@@ -114,22 +130,19 @@ public class DropBoxManager implements DestinationManager<DropBoxManager.DropBox
 		dest.path = DefaultPathDecoder.INSTANCE.decodePath(dest.path);
 		return dest;
 	}
-	
-	private static DbxAppInfo getDbxAppInfo() {
-		// For obvious reasons, your application keys and secret are not released with the source files.
-		// You should edit keys.properties in order to run this demo
-		ResourceBundle bundle = ResourceBundle.getBundle(DropBoxManager.class.getPackage().getName()+".keys"); //$NON-NLS-1$
-		String key = bundle.getString("appKey");
-		String secret = bundle.getString("appSecret");
-		if (key.length()==0 || secret.length()==0) {
-			throw new MissingResourceException("App key and secret not provided","","");
-		}
-		return new DbxAppInfo(key, secret);
-	}
 
 	@Override
 	public String getProtocol() {
 		return "dropbox";
+	}
+
+	/** Sets the supplier of Dropbox application's credentials.
+	 * <br>By default, the library uses the jdbbackup application's credential stored in keys.properties resource file.
+	 * <br>You can switch to another application of your choice by passing another supplier to this method.
+	 * @param dbxAppInfoProvider The new application credentials supplier
+	 */
+	public static void setDbxAppInfoSupplier(Supplier<DbxAppInfo> dbxAppInfoProvider) {
+		DropBoxManager.dbxAppInfoProvider = dbxAppInfoProvider;
 	}
 
 	public static void main(String[] args) throws CmdLineException {
@@ -142,7 +155,7 @@ public class DropBoxManager implements DestinationManager<DropBoxManager.DropBox
 	}
 
 	private void getToken() {
-	    DbxAppInfo appInfo = getDbxAppInfo();
+	    DbxAppInfo appInfo = dbxAppInfoProvider.get();
 	    DbxWebAuth auth = new DbxWebAuth(config, appInfo);
 	    DbxWebAuth.Request authRequest = DbxWebAuth.newRequestBuilder()
 	             .withNoRedirect()
