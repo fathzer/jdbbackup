@@ -174,7 +174,7 @@ public class DropBoxManager implements DestinationManager<DropBoxManager.DropBox
 	        JDbBackup.out("Keep it in a secure place as it allows to access to your backup folder on Dropbox");
 		} catch (Exception e) {
 			JDbBackup.err ("Sorry, an error occurred:");
-			e.printStackTrace();
+			JDbBackup.err(e);
 		}
 	}
 }

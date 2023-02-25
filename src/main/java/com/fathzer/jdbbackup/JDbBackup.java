@@ -45,7 +45,7 @@ public class JDbBackup {
 			out(backup(options));
 		} catch (IOException e) {
         	err("An error occurred while using arguments "+Arrays.toString(args));
-        	e.printStackTrace();
+        	err(e);
         }
 	}
 	
@@ -128,5 +128,9 @@ public class JDbBackup {
 	
 	public static void err(String message) {
 		System.err.println(message);
+	}
+	
+	public static void err(Throwable e) {
+		e.printStackTrace();
 	}
 }
