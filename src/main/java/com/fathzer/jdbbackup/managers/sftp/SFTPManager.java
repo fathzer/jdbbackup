@@ -78,7 +78,7 @@ public class SFTPManager implements DestinationManager<SFTPDestination> {
 			try (InputStream stream = new FileInputStream(file)) {
 				channel.put(stream, dest.getFilename());
 			}
-			final String fullPath = dest.getPath() == null ? dest.getFilename() : dest.getPath() + "/" + dest.getFilename();
+			final String fullPath = dest.getPath() == null ? dest.getFilename() : dest.getPath() + URI_PATH_SEPARATOR + dest.getFilename();
 			return "Sent to " + dest.getUser() + "@" + dest.getHost() + ": " + fullPath;
 		} catch (SftpException e) {
 			throw new IOException(e);
