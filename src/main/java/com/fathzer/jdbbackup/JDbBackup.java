@@ -61,7 +61,7 @@ public class JDbBackup {
 	}
 	
 	protected File createTempFile() throws IOException {
-		final File tmpFile = File.createTempFile("DBDump", ".gz");
+		final File tmpFile = Files.createTempFile("JDBBackup", ".gz").toFile();
 		tmpFile.deleteOnExit();
 		return tmpFile;
 	}
