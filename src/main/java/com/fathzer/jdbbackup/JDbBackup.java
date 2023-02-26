@@ -12,6 +12,7 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.spi.OptionHandler;
 import org.reflections.Reflections;
+import org.slf4j.LoggerFactory;
 
 public class JDbBackup {
 	public JDbBackup() {
@@ -62,8 +63,10 @@ public class JDbBackup {
 	
 	protected File createTempFile() throws IOException {
 		final File tmpFile = Files.createTempFile("JDBBackup", ".gz").toFile();
-		tmpFile.setReadable(true, true);
-		tmpFile.setWritable(true, true);
+		boolean securityApplied = tmpFile.setReadable(true, true) & tmpFile.setWritable(true, true);
+		if (!securityApplied) {
+			LoggerFactory.getLogger(getClass()).warn("Fail to apply security restrictions on temporary file");
+		}
 		tmpFile.deleteOnExit();
 		return tmpFile;
 	}
