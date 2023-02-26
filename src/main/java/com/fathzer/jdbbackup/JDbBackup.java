@@ -3,6 +3,7 @@ package com.fathzer.jdbbackup;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Set;
@@ -63,9 +64,17 @@ public class JDbBackup {
 	
 	protected File createTempFile() throws IOException {
 		final File tmpFile = Files.createTempFile("JDBBackup", ".gz").toFile();
-		boolean securityApplied = tmpFile.setReadable(true, true) & tmpFile.setWritable(true, true) & tmpFile.setExecutable(false, false);
-		if (!securityApplied) {
-			LoggerFactory.getLogger(getClass()).warn("Fail to apply security restrictions on temporary file");
+		if(!FileSystems.getDefault().supportedFileAttributeViews().contains("posix")) {
+			// On Posix compliant systems, java create tmp files with read/write rights only for user
+			// Let do the same on non Posix systems
+			final boolean readUserOnly = tmpFile.setReadable(true, true);
+			final boolean writeUserOnly = tmpFile.setWritable(true, true);
+			if (! (readUserOnly && writeUserOnly)) {
+				LoggerFactory.getLogger(getClass()).warn("Fail to apply security restrictions on temporary file. Restrict read to user: {}, restrict write to user: {}", readUserOnly, writeUserOnly);
+			}
+			if (tmpFile.setExecutable(false, false)) {
+				LoggerFactory.getLogger(getClass()).debug("Impossible to set temporary file not executable on this system");
+			}
 		}
 		tmpFile.deleteOnExit();
 		return tmpFile;

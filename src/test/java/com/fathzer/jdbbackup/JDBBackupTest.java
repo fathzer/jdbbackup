@@ -14,6 +14,9 @@ import java.util.zip.GZIPInputStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
+import org.slf4j.LoggerFactory;
+import org.slf4j.impl.LogUtils;
+import org.slf4j.impl.SimpleLogger;
 
 import com.fathzer.jdbbackup.dumper.FakeJavaSaver;
 
@@ -69,6 +72,9 @@ class JDBBackupTest {
 		o.setDestination("file://"+DEST_PATH);
 		FakeJavaSaver.shouldFail = true;
 		o.setDbType(new FakeJavaSaver().getDBType());
+		SimpleLogger log = (SimpleLogger) LoggerFactory.getLogger(com.fathzer.jdbbackup.dumper.FakeJavaSaver.class);
+		final int previous = LogUtils.setLevel(log, "off");
 		assertThrows(IOException.class, () -> b.backup(o));
+		LogUtils.setLevel(log, previous);
 	}
 }
