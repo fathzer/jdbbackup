@@ -63,7 +63,7 @@ public class JDbBackup {
 	
 	protected File createTempFile() throws IOException {
 		final File tmpFile = Files.createTempFile("JDBBackup", ".gz").toFile();
-		boolean securityApplied = tmpFile.setReadable(true, true) & tmpFile.setWritable(true, true);
+		boolean securityApplied = tmpFile.setReadable(true, true) & tmpFile.setWritable(true, true) & tmpFile.setExecutable(false, false);
 		if (!securityApplied) {
 			LoggerFactory.getLogger(getClass()).warn("Fail to apply security restrictions on temporary file");
 		}
