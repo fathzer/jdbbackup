@@ -6,6 +6,8 @@ import java.io.IOException;
 /** An abstract class to manage where backup are saved.
  */
 public interface DestinationManager<T> {
+	public static final char URI_PATH_SEPARATOR = '/';
+	
 	void setProxy(final ProxyOptions options);
 	
 	/** Gets the string that identifies the protocol.

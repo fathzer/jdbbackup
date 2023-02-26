@@ -1,5 +1,7 @@
 package com.fathzer.jdbbackup;
 
+import static com.fathzer.jdbbackup.DestinationManager.URI_PATH_SEPARATOR;
+
 class Destination {
 	private String type;
 	private String path;
@@ -14,7 +16,7 @@ class Destination {
 		}
 		this.type = dest.substring(0, index);
 		for (int i=1;i<=2;i++) {
-			if (index+i>=dest.length() || dest.charAt(index+i)!='/') {
+			if (index+i>=dest.length() || dest.charAt(index+i)!=URI_PATH_SEPARATOR) {
 				throw new IllegalArgumentException("Destination has not the right format: "+dest+" does not not match type://path");
 			}
 		}

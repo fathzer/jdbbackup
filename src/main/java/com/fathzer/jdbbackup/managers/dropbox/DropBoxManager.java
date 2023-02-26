@@ -114,7 +114,7 @@ public class DropBoxManager implements DestinationManager<DropBoxManager.DropBox
 	
 	@Override
 	public DropBoxDestination setDestinationPath(final String fileName) {
-		int index = fileName.indexOf('/');
+		int index = fileName.indexOf(URI_PATH_SEPARATOR);
 		if (index<=0) {
 			throw new IllegalArgumentException("Unable to locate token. "+"FileName should conform to the format access_token/path");
 		}
@@ -124,8 +124,8 @@ public class DropBoxManager implements DestinationManager<DropBoxManager.DropBox
 		if (dest.path.isEmpty()) {
 			throw new IllegalArgumentException("Unable to locate destination path. Path should conform to the format access_token/path");
 		}
-		if (!dest.path.startsWith("/")) {
-			dest.path = "/"+dest.path;
+		if (dest.path.charAt(0)!=URI_PATH_SEPARATOR) {
+			dest.path = URI_PATH_SEPARATOR+dest.path;
 		}
 		dest.path = DefaultPathDecoder.INSTANCE.decodePath(dest.path);
 		return dest;

@@ -1,5 +1,6 @@
 package com.fathzer.jdbbackup.managers.sftp;
 
+import static com.fathzer.jdbbackup.DestinationManager.URI_PATH_SEPARATOR;
 import com.fathzer.jdbbackup.DefaultPathDecoder;
 
 public class SFTPDestination {
@@ -14,7 +15,7 @@ public class SFTPDestination {
 	 * @param destination The destination in its string format: <i>user:pwd@host[:port][/path]/filename</i>
 	 */
 	public SFTPDestination(String destination) {
-		int index = destination.indexOf('/');
+		int index = destination.indexOf(URI_PATH_SEPARATOR);
 		if (index < 0) {
 			badFileName(destination);
 		}
@@ -62,7 +63,7 @@ public class SFTPDestination {
 
 	private void parsePath(String fileName, String path) {
 		path = DefaultPathDecoder.INSTANCE.decodePath(path);
-		int index = path.lastIndexOf('/');
+		int index = path.lastIndexOf(URI_PATH_SEPARATOR);
 		if (index < 0) {
 			this.filename = path;
 		} else {
