@@ -8,6 +8,7 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.spi.OptionHandler;
 
 public class JDbBackupCmd {
+	@SuppressWarnings("java:S106")
 	public static void main(String[] args) {
 		JDbBackupCmd backup = new JDbBackupCmd();
 		try {
@@ -62,7 +63,7 @@ public class JDbBackupCmd {
 		System.err.println(message);
 	}
 	
-	@SuppressWarnings("java:S106")
+	@SuppressWarnings("java:S")
 	public static void err(Throwable e) {
 		e.printStackTrace();
 	}
