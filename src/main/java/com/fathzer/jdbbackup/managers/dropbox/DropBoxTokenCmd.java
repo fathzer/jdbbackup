@@ -10,9 +10,8 @@ import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxAuthFinish;
 import com.dropbox.core.DbxWebAuth;
 import com.dropbox.core.TokenAccessType;
-
-import com.fathzer.jdbbackup.JDbBackupCmd;
-import com.fathzer.jdbbackup.ProxyOptions;
+import com.fathzer.jdbbackup.cmd.ProxyOptions;
+import com.fathzer.jdbbackup.cmd.JDbBackupCmd;
 
 /** A helper class to obtain a token usable with DropBoxManager
  */
@@ -23,7 +22,7 @@ public class DropBoxTokenCmd extends DropBoxBase {
 		CmdLineParser parser = new CmdLineParser(options);
 		parser.parseArgument(args);
 		DropBoxTokenCmd archiver = new DropBoxTokenCmd();
-		archiver.setProxy(options);
+		archiver.setProxy(options.toProxySettings());
 		archiver.getToken();
 	}
 

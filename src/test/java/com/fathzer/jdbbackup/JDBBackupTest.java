@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
@@ -42,19 +43,18 @@ class JDBBackupTest {
 	@EnabledIf("com.fathzer.jdbbackup.JavaProcessAvailabilityChecker#available")
 	void testOk() throws IOException {
 		final ObservableJDbBackup b = new ObservableJDbBackup();
-		final Options o = new Options();
 		// No destination
-		assertThrows(IllegalArgumentException.class, () -> b.backup(o));
-		o.setDestination("file://"+DEST_PATH);
+		assertThrows(IllegalArgumentException.class, () -> b.backup(null, null, null));
+		String dest = "file://"+DEST_PATH;
 
 		// No DbName
 		assertTrue(b.tmpFile==null || !b.tmpFile.exists());
-		assertThrows(IllegalArgumentException.class, () -> b.backup(o));
+		assertThrows(IllegalArgumentException.class, () -> b.backup(null, null, dest));
 		assertTrue(b.tmpFile==null || !b.tmpFile.exists());
 		
 		FakeJavaDumper.shouldFail = false;
-		o.setDbType(new FakeJavaDumper().getDBType());
-		b.backup(o);
+		URI db = URI.create("java://test");
+		b.backup(null, db, dest);
 		assertTrue(b.tmpFile==null || !b.tmpFile.exists());
 		
 		try (BufferedReader reader = new BufferedReader(
@@ -68,13 +68,12 @@ class JDBBackupTest {
 	@EnabledIf("com.fathzer.jdbbackup.JavaProcessAvailabilityChecker#available")
 	void testKo() throws IOException {
 		final ObservableJDbBackup b = new ObservableJDbBackup();
-		final Options o = new Options();
-		o.setDestination("file://"+DEST_PATH);
+		String dest = "file://"+DEST_PATH;
+		URI db = URI.create("java://test");
 		FakeJavaDumper.shouldFail = true;
-		o.setDbType(new FakeJavaDumper().getDBType());
 		SimpleLogger log = (SimpleLogger) LoggerFactory.getLogger(com.fathzer.jdbbackup.dumper.FakeJavaDumper.class);
 		final int previous = LogUtils.setLevel(log, "off");
-		assertThrows(IOException.class, () -> b.backup(o));
+		assertThrows(IOException.class, () -> b.backup(null, db, dest));
 		LogUtils.setLevel(log, previous);
 	}
 }

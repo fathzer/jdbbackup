@@ -3,6 +3,8 @@ package com.fathzer.jdbbackup;
 import java.io.File;
 import java.io.IOException;
 
+import com.fathzer.jdbbackup.utils.ProxySettings;
+
 /** An abstract class to manage where backup are saved.
  */
 public interface DestinationManager<T> {
@@ -11,7 +13,7 @@ public interface DestinationManager<T> {
 	/** Sets the proxy configuration of this manager.
 	 * @param options The proxy options
 	 */
-	void setProxy(final ProxyOptions options);
+	void setProxy(final ProxySettings options);
 	
 	/** Gets the string that identifies the protocol.
 	 * <br>Example file, dropbox, sftp. This destination manager will have to process all file transfers related to destinations that begins with <i>protocol</i>:// 

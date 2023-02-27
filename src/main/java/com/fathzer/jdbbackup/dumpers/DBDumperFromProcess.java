@@ -6,13 +6,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.InterruptedIOException;
+import java.net.URI;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fathzer.jdbbackup.DBDumper;
-import com.fathzer.jdbbackup.Options;
 
 /** A class able to dump a database to a compressed (.gz) file.
  * <br>Data base dump is obtained through a command line.
@@ -23,8 +23,8 @@ public abstract class DBDumperFromProcess implements DBDumper {
 	}
 	
 	@Override
-	public void save(Options params, File destFile) throws IOException {
-		final List<String> commands = getCommand(params);
+	public void save(URI srcURI, File destFile) throws IOException {
+		final List<String> commands = getCommand(srcURI);
 
 		final ProcessBuilder pb = new ProcessBuilder(commands);
 		final Process process = pb.start();
@@ -65,9 +65,9 @@ public abstract class DBDumperFromProcess implements DBDumper {
     }
 
 	/** Gets the command line to execute to save the database.
-	 * @param params The database access parameters
+	 * @param srcURI The database access URI
 	 * @return The list of the tokens that compose the command
 	 * @throws IllegalArgumentException if Options are invalid 
 	 */
-	protected abstract List<String> getCommand(Options params);
+	protected abstract List<String> getCommand(URI srcURI);
 }

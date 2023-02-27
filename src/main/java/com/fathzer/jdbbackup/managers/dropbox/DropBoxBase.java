@@ -15,8 +15,7 @@ import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.http.StandardHttpRequestor;
 import com.dropbox.core.http.StandardHttpRequestor.Config;
-
-import com.fathzer.jdbbackup.ProxyOptions;
+import com.fathzer.jdbbackup.utils.ProxySettings;
 
 /** Common component between {@link com.fathzer.jdbbackup.managers.dropbox.DropBoxManager} and {@link com.fathzer.jdbbackup.managers.dropbox.DropBoxTokenCmd}
  */
@@ -40,15 +39,15 @@ public class DropBoxBase {
 	
 	DbxRequestConfig config;
 
-	public void setProxy(final ProxyOptions options) {
+	public void setProxy(final ProxySettings options) {
 		Config.Builder builder = Config.builder();
-		if (options.getProxyHost()!=null) {
-			Proxy proxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(options.getProxyHost(),options.getProxyPort()));
-			if (options.getProxyUser() != null) {
+		if (options.getHost()!=null) {
+			Proxy proxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(options.getHost(),options.getPort()));
+			if (options.getLogin() != null) {
 				Authenticator.setDefault(new Authenticator() {
 					@Override
 					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(options.getProxyUser(), options.getProxyPwd().toCharArray());
+						return new PasswordAuthentication(options.getLogin().getUser(), options.getLogin().getPassword().toCharArray());
 					}
 				});
 			}

@@ -8,7 +8,7 @@ import java.nio.file.StandardCopyOption;
 
 import com.fathzer.jdbbackup.DefaultPathDecoder;
 import com.fathzer.jdbbackup.DestinationManager;
-import com.fathzer.jdbbackup.ProxyOptions;
+import com.fathzer.jdbbackup.utils.ProxySettings;
 
 /** A destination manager that saves the backups locally.
  * <br>It uses an instance of {@link DefaultPathDecoder} in order to build the destination path.
@@ -19,7 +19,7 @@ public class FileManager implements DestinationManager<Path> {
 	}
 
 	@Override
-	public void setProxy(ProxyOptions options) {
+	public void setProxy(ProxySettings options) {
 		// Ignore proxy as there's no network access there.
 	}
 

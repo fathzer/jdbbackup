@@ -1,4 +1,4 @@
-package com.fathzer.jdbbackup;
+package com.fathzer.jdbbackup.cmd;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -6,6 +6,8 @@ import java.util.Arrays;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.spi.OptionHandler;
+
+import com.fathzer.jdbbackup.JDbBackup;
 
 /** A command line tool to perform backup.
  */
@@ -35,7 +37,7 @@ public class JDbBackupCmd {
 			throw new IllegalArgumentException(e);
 		}
 		try {
-			out(new JDbBackup().backup(options));
+			out(new JDbBackup().backup(options.toProxySettings(), options.getDbURI(), options.getDestination()));
 		} catch (IOException e) {
         	err("An error occurred while using arguments "+Arrays.toString(args));
         	err(e);

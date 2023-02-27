@@ -2,6 +2,7 @@ package com.fathzer.jdbbackup;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.HashMap;
@@ -9,6 +10,8 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 import org.slf4j.LoggerFactory;
+
+import com.fathzer.jdbbackup.utils.ProxySettings;
 
 /** A class able to perform a database backup.
  */
@@ -29,19 +32,22 @@ public class JDbBackup {
 	 */
 	public static void loadPlugins(ClassLoader classLoader) {
 		ServiceLoader.load(DestinationManager.class, classLoader).forEach(m -> MANAGERS.put(m.getProtocol(), m));
-		ServiceLoader.load(DBDumper.class, classLoader).forEach(s -> SAVERS.put(s.getDBType(), s));
+		ServiceLoader.load(DBDumper.class, classLoader).forEach(s -> SAVERS.put(s.getScheme(), s));
 	}
 	
 	public JDbBackup() {
 		super();
 	}
 	
-	public String backup(Options options) throws IOException {
-		final Destination destination = new Destination(options.getDestination());
-		final DestinationManager<?> manager = getDestinationManager(destination);
+	public String backup(ProxySettings proxySettings, URI srcURI, String destination) throws IOException {
+		if (srcURI==null || destination==null) {
+			throw new IllegalArgumentException();
+		}
+		final Destination dest = new Destination(destination);
+		final DestinationManager<?> manager = getDestinationManager(dest);
 		final File tmpFile = createTempFile();
 		try {
-			return backup(options, manager, destination, tmpFile);
+			return backup(proxySettings, srcURI, manager, dest, tmpFile);
 		} finally {
 			Files.delete(tmpFile.toPath());
 		}
@@ -65,10 +71,10 @@ public class JDbBackup {
 		return tmpFile;
 	}
 	
-	private <T> String backup(Options options, DestinationManager<T> manager, Destination destination, File tmpFile) throws IOException {
-		manager.setProxy(options);
+	private <T> String backup(ProxySettings proxySettings, URI dbURI, DestinationManager<T> manager, Destination destination, File tmpFile) throws IOException {
+		manager.setProxy(proxySettings);
 		T destFile = manager.setDestinationPath(destination.getPath());
-		getDBSaver(options.getDbType()).save(options, tmpFile);
+		getDBSaver(dbURI.getScheme()).save(dbURI, tmpFile);
 		return manager.send(tmpFile, destFile);
 	}
 	

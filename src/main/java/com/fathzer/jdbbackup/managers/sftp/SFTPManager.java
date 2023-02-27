@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.fathzer.jdbbackup.DestinationManager;
-import com.fathzer.jdbbackup.ProxyOptions;
+import com.fathzer.jdbbackup.utils.ProxySettings;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSch;
@@ -30,11 +30,11 @@ public class SFTPManager implements DestinationManager<SFTPDestination> {
 	}
 
 	@Override
-	public void setProxy(ProxyOptions options) {
-		if (options.getProxyHost() != null) {
-			proxy = new ProxyHTTP(options.getProxyHost(), options.getProxyPort());
-			if (options.getProxyUser() != null) {
-				proxy.setUserPasswd(options.getProxyUser(), options.getProxyPwd());
+	public void setProxy(ProxySettings options) {
+		if (options.getHost() != null) {
+			proxy = new ProxyHTTP(options.getHost(), options.getPort());
+			if (options.getLogin() != null) {
+				proxy.setUserPasswd(options.getLogin().getUser(), options.getLogin().getPassword());
 			}
 		}
 	}
