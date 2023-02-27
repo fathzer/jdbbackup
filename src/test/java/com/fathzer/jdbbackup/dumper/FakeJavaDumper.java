@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.fathzer.jdbbackup.Options;
 
-public final class FakeJavaSaver extends DBSaverFromProcess {
+public final class FakeJavaDumper extends DBDumperFromProcess {
 	public static final List<String> CONTENT = Arrays.asList("Hello,","This is a fake db dump");
 	public static boolean shouldFail;
 	@Override
@@ -16,8 +16,8 @@ public final class FakeJavaSaver extends DBSaverFromProcess {
 
 	@Override
 	protected List<String> getCommand(Options params) {
-		List<String> args = shouldFail ? Arrays.asList("java",FakeJavaSaver.class.getName()) :
-			Arrays.asList("java","-cp","./target/classes"+File.pathSeparator+"./target/test-classes",FakeJavaSaver.class.getName());
+		List<String> args = shouldFail ? Arrays.asList("java",FakeJavaDumper.class.getName()) :
+			Arrays.asList("java","-cp","./target/classes"+File.pathSeparator+"./target/test-classes",FakeJavaDumper.class.getName());
 		return args;
 	}
 	

@@ -1,0 +1,3 @@
+com.fathzer.jdbbackup.managers.dropbox.DropBoxManager
+com.fathzer.jdbbackup.managers.local.FileManager
+com.fathzer.jdbbackup.managers.sftp.SFTPManager

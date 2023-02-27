@@ -2,16 +2,23 @@ package com.fathzer.jdbbackup;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.util.Set;
-import java.util.function.Predicate;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ServiceLoader;
 
-import org.reflections.Reflections;
 import org.slf4j.LoggerFactory;
 
 public class JDbBackup {
+	private static final Map<String, DestinationManager<?>> MANAGERS = new HashMap<>();
+	private static final Map<String, DBDumper> SAVERS = new HashMap<>();
+	
+	static {
+		ServiceLoader.load(DestinationManager.class).forEach(m -> MANAGERS.put(m.getProtocol(), m));
+		ServiceLoader.load(DBDumper.class).forEach(s -> SAVERS.put(s.getDBType(), s));
+	}
+	
 	public JDbBackup() {
 		super();
 	}
@@ -54,37 +61,18 @@ public class JDbBackup {
 	
 	protected <T> DestinationManager<T> getDestinationManager(Destination destination) {
 		@SuppressWarnings("unchecked")
-		final DestinationManager<T> manager = findClass(DestinationManager.class, c -> c.getProtocol().equals(destination.getType()));
+		final DestinationManager<T> manager = (DestinationManager<T>) MANAGERS.get(destination.getType());
 		if (manager==null) {
 			throw new IllegalArgumentException("Unknown protocol: "+destination.getType());
 		}
 		return manager;
 	}
 	
-	protected DBSaver getDBSaver(String dbType) {
-		final DBSaver saver = findClass(DBSaver.class, c -> c.getDBType().equals(dbType));
+	protected DBDumper getDBSaver(String dbType) {
+		final DBDumper saver = SAVERS.get(dbType);
 		if (saver==null) {
 			throw new IllegalArgumentException("Unknown database type: "+dbType);
 		}
 		return saver;
-	}
-
-	private <T> T findClass(Class<T> aClass, Predicate<T> filter) {
-		final Reflections reflections = new Reflections("com.fathzer.jdbbackup");
-		final Set<Class<? extends T>> classes = reflections.getSubTypesOf(aClass);
-		for (Class<? extends T> implClass : classes) {
-			if (!Modifier.isAbstract(implClass.getModifiers())) {
-				final T candidate;
-				try {
-					candidate = implClass.getConstructor().newInstance();
-				} catch (ReflectiveOperationException e) {
-					throw new DestinationManagerInstantiationException(e);
-				}
-				if (filter.test(candidate)) {
-					return candidate;
-				}
-			}
-		}
-		return null;
 	}
 }

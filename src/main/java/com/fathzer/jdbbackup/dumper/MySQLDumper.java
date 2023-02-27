@@ -8,7 +8,7 @@ import com.fathzer.jdbbackup.Options;
 /** A DBSaver that saves MYSQL database.
  * <br>It requires mysqldump to be installed on the machine.
  */
-public class MySQLSaver extends DBSaverFromProcess {
+public class MySQLDumper extends DBDumperFromProcess {
 	@Override
 	protected List<String> getCommand(Options params) {
 		if (isEmpty(params.getDbName()) || isEmpty(params.getDbHost()) || params.getDbPort()<=0 || isEmpty(params.getDbUser())) {

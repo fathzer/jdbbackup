@@ -11,14 +11,14 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fathzer.jdbbackup.DBSaver;
+import com.fathzer.jdbbackup.DBDumper;
 import com.fathzer.jdbbackup.Options;
 
-/** A class able to save a database to a compressed (.gz) file.
+/** A class able to dump a database to a compressed (.gz) file.
  * <br>Data base dump is obtained through a command line.
  */
-public abstract class DBSaverFromProcess implements DBSaver {
-	protected DBSaverFromProcess() {
+public abstract class DBDumperFromProcess implements DBDumper {
+	protected DBDumperFromProcess() {
 		super();
 	}
 	
@@ -34,7 +34,7 @@ public abstract class DBSaverFromProcess implements DBSaver {
 		compressThread.start();
 		final InputStream err = process.getErrorStream();
 		Thread errorThread = new Thread(() -> {
-				final Logger logger = LoggerFactory.getLogger(DBSaverFromProcess.this.getClass());
+				final Logger logger = LoggerFactory.getLogger(DBDumperFromProcess.this.getClass());
 				try (BufferedReader bufErr = new BufferedReader(new InputStreamReader(err))) {
 					for (String line = bufErr.readLine(); line!=null; line = bufErr.readLine()) {
 						logger.warn(line);

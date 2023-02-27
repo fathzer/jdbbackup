@@ -3,9 +3,9 @@ package com.fathzer.jdbbackup;
 import java.io.File;
 import java.io.IOException;
 
-/** A class able to save a database to a compressed file.
+/** A class able to dump a database to a file.
  */
-public interface DBSaver {
+public interface DBDumper {
 	/** Gets the type of database this saver can dump.
 	 * @return a string (example mysql)
 	 */
