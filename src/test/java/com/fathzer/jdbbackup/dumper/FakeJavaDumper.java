@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.fathzer.jdbbackup.Options;
+import com.fathzer.jdbbackup.dumpers.DBDumperFromProcess;
 
 public final class FakeJavaDumper extends DBDumperFromProcess {
 	public static final List<String> CONTENT = Arrays.asList("Hello,","This is a fake db dump");

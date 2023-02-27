@@ -10,13 +10,26 @@ import java.util.ServiceLoader;
 
 import org.slf4j.LoggerFactory;
 
+/** A class able to perform a database backup.
+ */
 public class JDbBackup {
 	private static final Map<String, DestinationManager<?>> MANAGERS = new HashMap<>();
 	private static final Map<String, DBDumper> SAVERS = new HashMap<>();
 	
 	static {
-		ServiceLoader.load(DestinationManager.class).forEach(m -> MANAGERS.put(m.getProtocol(), m));
-		ServiceLoader.load(DBDumper.class).forEach(s -> SAVERS.put(s.getDBType(), s));
+		loadPlugins(ClassLoader.getSystemClassLoader());
+	}
+	
+	/** Loads extra plugins.
+	 * <br>Plugins allow you to extends this library to dump sources to destinations not supported by this library.
+	 * <br>They are loaded using the {@link java.util.ServiceLoader} mechanism.
+	 * @param classLoader The class loader used to load the plugins. For instance a class loader over jar files in a directory is exposed in <a href="https://stackoverflow.com/questions/16102010/dynamically-loading-plugin-jars-using-serviceloader">The second option exposed in this question</a>).
+	 * @see DBDumper
+	 * @see DestinationManager
+	 */
+	public static void loadPlugins(ClassLoader classLoader) {
+		ServiceLoader.load(DestinationManager.class, classLoader).forEach(m -> MANAGERS.put(m.getProtocol(), m));
+		ServiceLoader.load(DBDumper.class, classLoader).forEach(s -> SAVERS.put(s.getDBType(), s));
 	}
 	
 	public JDbBackup() {
@@ -61,9 +74,9 @@ public class JDbBackup {
 	
 	protected <T> DestinationManager<T> getDestinationManager(Destination destination) {
 		@SuppressWarnings("unchecked")
-		final DestinationManager<T> manager = (DestinationManager<T>) MANAGERS.get(destination.getType());
+		final DestinationManager<T> manager = (DestinationManager<T>) MANAGERS.get(destination.getProtocol());
 		if (manager==null) {
-			throw new IllegalArgumentException("Unknown protocol: "+destination.getType());
+			throw new IllegalArgumentException("Unknown protocol: "+destination.getProtocol());
 		}
 		return manager;
 	}

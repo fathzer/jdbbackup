@@ -26,7 +26,7 @@ class Destination {
 		}
 	}
 
-	public String getType() {
+	public String getProtocol() {
 		return type;
 	}
 

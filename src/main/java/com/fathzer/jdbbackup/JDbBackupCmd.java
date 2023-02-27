@@ -7,6 +7,8 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.spi.OptionHandler;
 
+/** A command line tool to perform backup.
+ */
 public class JDbBackupCmd {
 	@SuppressWarnings("java:S106")
 	public static void main(String[] args) {
