@@ -18,7 +18,6 @@ import com.fathzer.jdbbackup.ProxyOptions;
  */
 public class DropBoxTokenCmd extends DropBoxBase {
 
-
 	public static void main(String[] args) throws CmdLineException {
 		ProxyOptions options = new ProxyOptions();
 		CmdLineParser parser = new CmdLineParser(options);
