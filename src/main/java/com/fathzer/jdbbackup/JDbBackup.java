@@ -5,50 +5,15 @@ import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.spi.OptionHandler;
 import org.reflections.Reflections;
 import org.slf4j.LoggerFactory;
 
 public class JDbBackup {
 	public JDbBackup() {
 		super();
-	}
-	
-	public static void main(String[] args) {
-		JDbBackup backup = new JDbBackup();
-		try {
-			backup.doIt(args);
-        } catch (IllegalArgumentException e) {
-            err(e.getMessage());
-            // Create a new parser in order to not have currently parsed options displayed as default.
-            CmdLineParser p = new CmdLineParser(new Options());
-            err("java "+JDbBackup.class.getName()+" [options...] "+getArguments(p));
-            // print the list of available options
-            p.printUsage(System.err);
-        }
-	}
-
-	private void doIt(String[] args) {
-		Options options = new Options();
-		CmdLineParser parser = new CmdLineParser(options);
-		try {
-			// parse the arguments.
-			parser.parseArgument(args);
-		} catch(CmdLineException e) {
-			throw new IllegalArgumentException(e);
-		}
-		try {
-			out(backup(options));
-		} catch (IOException e) {
-        	err("An error occurred while using arguments "+Arrays.toString(args));
-        	err(e);
-        }
 	}
 	
 	public String backup(Options options) throws IOException {
@@ -121,30 +86,5 @@ public class JDbBackup {
 			}
 		}
 		return null;
-	}
-
-	private static CharSequence getArguments(CmdLineParser parser) {
-		StringBuilder builder = new StringBuilder();
-		for (OptionHandler<?> arg:parser.getArguments()) {
-			if (arg.option.required()) {
-				if (builder.length()!=0) {
-					builder.append(' ');
-				}
-				builder.append(arg.option.metaVar());
-			}
-		}
-		return builder;
-	}
-	
-	public static void out(String message) {
-		System.out.println(message);
-	}
-	
-	public static void err(String message) {
-		System.err.println(message);
-	}
-	
-	public static void err(Throwable e) {
-		e.printStackTrace();
 	}
 }

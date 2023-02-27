@@ -8,6 +8,9 @@ import java.io.IOException;
 public interface DestinationManager<T> {
 	public static final char URI_PATH_SEPARATOR = '/';
 	
+	/** Sets the proxy configuration of this manager.
+	 * @param options The proxy options
+	 */
 	void setProxy(final ProxyOptions options);
 	
 	/** Gets the string that identifies the protocol.
