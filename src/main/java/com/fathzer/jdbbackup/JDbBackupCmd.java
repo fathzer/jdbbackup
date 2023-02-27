@@ -63,7 +63,7 @@ public class JDbBackupCmd {
 		System.err.println(message);
 	}
 	
-	@SuppressWarnings("java:S")
+	@SuppressWarnings("java:S4507")
 	public static void err(Throwable e) {
 		e.printStackTrace();
 	}
