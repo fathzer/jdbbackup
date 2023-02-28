@@ -30,10 +30,13 @@ public class ProxySettings {
 
 	/** Creates a proxy setting from a string.
 	 * @param proxy The address in the format [user:[password]@]host:port 
-	 * @return A proxy setting
+	 * @return A proxy setting or null if argument is null or empty
 	 * @throws IllegalArgumentException if argument is incorrect
 	 */
 	public static ProxySettings fromString(String proxy) {
+		if (proxy==null || proxy.trim().isEmpty()) {
+			return null;
+		}
 		final ProxySettings result = new ProxySettings();
 		try {
 			final URI uri = new URI("http://"+proxy);

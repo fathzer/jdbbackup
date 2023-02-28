@@ -2,33 +2,37 @@ package com.fathzer.jdbbackup.managers.dropbox;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
+import java.util.concurrent.Callable;
 
 import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxAuthFinish;
 import com.dropbox.core.DbxWebAuth;
 import com.dropbox.core.TokenAccessType;
-import com.fathzer.jdbbackup.cmd.ProxyOptions;
 import com.fathzer.jdbbackup.cmd.JDbBackupCmd;
+import com.fathzer.jdbbackup.utils.ProxySettings;
+
+import picocli.CommandLine;
+import picocli.CommandLine.Option;
 
 /** A helper class to obtain a token usable with DropBoxManager
  */
-public class DropBoxTokenCmd extends DropBoxBase {
+public class DropBoxTokenCmd extends DropBoxBase implements Callable<Integer> {
+	@Option(names={"-p","--proxy"}, description="The proxy used to communicate with Dropbox, format is [user[:pwd]@]host:port", converter = ProxySettingsConverter.class)
+	private ProxySettings proxy;
+	
+	public static void main(String... args) {
+		System.exit(new CommandLine(new DropBoxTokenCmd()).execute(args));
+    }
 
-	public static void main(String[] args) throws CmdLineException {
-		ProxyOptions options = new ProxyOptions();
-		CmdLineParser parser = new CmdLineParser(options);
-		parser.parseArgument(args);
-		DropBoxTokenCmd archiver = new DropBoxTokenCmd();
-		archiver.setProxy(options.toProxySettings());
-		archiver.getToken();
+	public Integer call() throws Exception {
+		setProxy(proxy);
+		getToken();
+		return 0;
 	}
 
 	private void getToken() {
 	    DbxAppInfo appInfo = dbxAppInfoProvider.get();
-	    DbxWebAuth auth = new DbxWebAuth(config, appInfo);
+	    DbxWebAuth auth = new DbxWebAuth(getConfig(), appInfo);
 	    DbxWebAuth.Request authRequest = DbxWebAuth.newRequestBuilder()
 	             .withNoRedirect()
 	             .withTokenAccessType(TokenAccessType.OFFLINE)

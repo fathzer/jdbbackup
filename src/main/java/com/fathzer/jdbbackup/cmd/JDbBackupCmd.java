@@ -1,60 +1,45 @@
 package com.fathzer.jdbbackup.cmd;
 
 import java.io.IOException;
-import java.util.Arrays;
-
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.spi.OptionHandler;
+import java.net.URI;
+import java.util.concurrent.Callable;
 
 import com.fathzer.jdbbackup.JDbBackup;
+import com.fathzer.jdbbackup.managers.dropbox.ProxySettingsConverter;
+import com.fathzer.jdbbackup.utils.ProxySettings;
+
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
 
 /** A command line tool to perform backup.
  */
-public class JDbBackupCmd {
+@Command(name="java com.fathzer.jdbbackup.cmd.JDbBackupCmd", mixinStandardHelpOptions = true, description = "Saves a database to a destination", usageHelpWidth = 160)
+public class JDbBackupCmd implements Callable<Integer> {
+	@Parameters(index="0", description="Data base url (for example mysql://user:pwd@host:port/db")
+    private URI db;
+	@Parameters(index="1", description = "Destination (example sftp://user:pwd@host/filepath)")
+    private String dest;
+	@Option(names={"-p","--proxy"}, description="The proxy used for the backup, format is [user[:pwd]@]host:port", converter = ProxySettingsConverter.class)
+	private ProxySettings proxy;
+	
+	public static void main(String... args) {
+		System.exit(new CommandLine(new JDbBackupCmd()).execute(args));
+    }
+	
 	@SuppressWarnings("java:S106")
-	public static void main(String[] args) {
-		JDbBackupCmd backup = new JDbBackupCmd();
+	public Integer call() throws Exception {
 		try {
-			backup.doIt(args);
+			new JDbBackup().backup(proxy, db, dest);
+			return 0;
         } catch (IllegalArgumentException e) {
-            err(e.getMessage());
-            // Create a new parser in order to not have currently parsed options displayed as default.
-            CmdLineParser p = new CmdLineParser(new Options());
-            err("java "+JDbBackupCmd.class.getName()+" [options...] "+getArguments(p));
-            // print the list of available options
-            p.printUsage(System.err);
-        }
-	}
-
-	private void doIt(String[] args) {
-		Options options = new Options();
-		CmdLineParser parser = new CmdLineParser(options);
-		try {
-			// parse the arguments.
-			parser.parseArgument(args);
-		} catch(CmdLineException e) {
-			throw new IllegalArgumentException(e);
-		}
-		try {
-			out(new JDbBackup().backup(options.toProxySettings(), options.getDbURI(), options.getDestination()));
-		} catch (IOException e) {
-        	err("An error occurred while using arguments "+Arrays.toString(args));
         	err(e);
+        	return 1;
+        } catch (IOException e) {
+        	err(e);
+        	return 2;
         }
-	}
-
-	private static CharSequence getArguments(CmdLineParser parser) {
-		StringBuilder builder = new StringBuilder();
-		for (OptionHandler<?> arg:parser.getArguments()) {
-			if (arg.option.required()) {
-				if (builder.length()!=0) {
-					builder.append(' ');
-				}
-				builder.append(arg.option.metaVar());
-			}
-		}
-		return builder;
 	}
 	
 	@SuppressWarnings("java:S106")

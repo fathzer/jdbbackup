@@ -37,25 +37,39 @@ public class DropBoxBase {
 		}
 	};
 	
-	DbxRequestConfig config;
+	private DbxRequestConfig config;
+	private ProxySettings proxySettings;
 
 	public void setProxy(final ProxySettings options) {
-		Config.Builder builder = Config.builder();
-		if (options.getHost()!=null) {
-			Proxy proxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(options.getHost(),options.getPort()));
-			if (options.getLogin() != null) {
-				Authenticator.setDefault(new Authenticator() {
-					@Override
-					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(options.getLogin().getUser(), options.getLogin().getPassword().toCharArray());
-					}
-				});
+		this.proxySettings = options;
+		this.config = null;
+	}
+	
+	protected ProxySettings getProxySettings() {
+		return this.proxySettings;
+	}
+	
+	protected DbxRequestConfig getConfig() {
+		if (config==null) {
+			Config.Builder builder = Config.builder();
+			if (proxySettings!=null && proxySettings.getHost()!=null) {
+				Proxy proxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(proxySettings.getHost(),proxySettings.getPort()));
+				if (proxySettings.getLogin() != null) {
+					Authenticator.setDefault(new Authenticator() {
+						@Override
+						protected PasswordAuthentication getPasswordAuthentication() {
+							return new PasswordAuthentication(proxySettings.getLogin().getUser(), proxySettings.getLogin().getPassword().toCharArray());
+						}
+					});
+				}
+				builder.withProxy(proxy);
 			}
-			builder.withProxy(proxy);
+
+			DbxRequestConfig.Builder rbuilder = DbxRequestConfig.newBuilder(NAME);
+			rbuilder.withHttpRequestor(new StandardHttpRequestor(builder.build()));
+			this.config = rbuilder.build();
 		}
-		DbxRequestConfig.Builder rbuilder = DbxRequestConfig.newBuilder(NAME);
-		rbuilder.withHttpRequestor(new StandardHttpRequestor(builder.build()));
-		this.config = rbuilder.build();
+		return config;
 	}
 
 	/** Sets the supplier of Dropbox application's credentials.
