@@ -36,6 +36,8 @@ class MySQLDumperTest {
 		assertThrows(IllegalArgumentException.class, () -> d.getCommand(noPassword));
 		final URI noUser = URI.create("mysql://:p@host/db");
 		assertThrows(IllegalArgumentException.class, () -> d.getCommand(noUser));
+		final URI wrongProtocol = URI.create("http://u:p@host/db");
+		assertThrows(IllegalArgumentException.class, () -> d.getCommand(wrongProtocol));
 	}
 	
 	private void expect(List<String> command, String user, String pwd, String host, int port, String db) {
