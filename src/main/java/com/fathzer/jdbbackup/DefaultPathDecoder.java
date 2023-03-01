@@ -2,6 +2,7 @@ package com.fathzer.jdbbackup;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,16 +43,19 @@ public class DefaultPathDecoder {
 		if (previous<path.length()) {
 			sb.append(path.substring(previous));
 		}
-		String result = sb.toString();
-		if (!result.endsWith(".gz")) {
-			if (!result.endsWith(".sql")) { //TODO May depends on database ?
-				sb.append(".sql");
-			}
-			sb.append(".gz");
-		}
 		return sb.toString();
 	}
-	
+
+	/** Decodes a path and adds extension if needed.
+	 * @param path The encoded path
+	 * @param extensionManager A function responsible for adding (or not) an extension to the path
+	 * @return The decoded path
+	 * @throws IllegalNamePatternException if the path has wrong format
+	 */
+	public String decodePath(String path, Function<String,CharSequence> extensionManager) throws IllegalNamePatternException {
+		return extensionManager.apply(decodePath(path)).toString();
+	}
+
 	/** Decodes a pattern.
 	 * <br>See {@link DefaultPathDecoder class comments} to learn what names are supported.
 	 * @param name The pattern name.

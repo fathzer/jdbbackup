@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
+import java.util.function.Function;
 
 import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxException;
@@ -25,6 +25,13 @@ public class DropBoxManager extends DropBoxBase implements DestinationManager<Dr
 	static class DropBoxDestination {
 		private String token;
 		private String path;
+		
+		String getToken() {
+			return token;
+		}
+		String getPath() {
+			return path;
+		}
 	}
 	
 	/** Constructor.
@@ -56,7 +63,7 @@ public class DropBoxManager extends DropBoxBase implements DestinationManager<Dr
 	}
 	
 	@Override
-	public DropBoxDestination setDestinationPath(final String fileName) {
+	public DropBoxDestination setDestinationPath(final String fileName, Function<String,CharSequence> extensionBuilder) {
 		int index = fileName.indexOf(URI_PATH_SEPARATOR);
 		if (index<=0) {
 			throw new IllegalArgumentException("Unable to locate token. "+"FileName should conform to the format access_token/path");
@@ -70,7 +77,7 @@ public class DropBoxManager extends DropBoxBase implements DestinationManager<Dr
 		if (dest.path.charAt(0)!=URI_PATH_SEPARATOR) {
 			dest.path = URI_PATH_SEPARATOR+dest.path;
 		}
-		dest.path = DefaultPathDecoder.INSTANCE.decodePath(dest.path);
+		dest.path = DefaultPathDecoder.INSTANCE.decodePath(dest.path, extensionBuilder);
 		return dest;
 	}
 

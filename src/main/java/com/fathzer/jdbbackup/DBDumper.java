@@ -3,10 +3,22 @@ package com.fathzer.jdbbackup;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.function.Function;
+
+import com.fathzer.jdbbackup.utils.DefaultExtensionBuilder;
 
 /** A class able to dump a database to a file.
  */
 public interface DBDumper {
+
+	/** Gets the extension builder of this dumper.
+	 * <br>The returned instance is responsible for adding (or not) an extension to the target path.
+	 * @return a function
+	 */
+	default Function<String,CharSequence> getExtensionBuilder() {
+		return DefaultExtensionBuilder.INSTANCE;
+	}
+	
 	/** Gets the scheme used in the URL to identify the type of database this saver can dump.
 	 * @return a string (example mysql)
 	 */

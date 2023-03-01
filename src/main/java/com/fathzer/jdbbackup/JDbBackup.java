@@ -73,8 +73,9 @@ public class JDbBackup {
 	
 	private <T> String backup(ProxySettings proxySettings, URI dbURI, DestinationManager<T> manager, Destination destination, File tmpFile) throws IOException {
 		manager.setProxy(proxySettings);
-		T destFile = manager.setDestinationPath(destination.getPath());
-		getDBSaver(dbURI.getScheme()).save(dbURI, tmpFile);
+		DBDumper dumper = getDBDumper(dbURI.getScheme());
+		T destFile = manager.setDestinationPath(destination.getPath(), dumper.getExtensionBuilder());
+		dumper.save(dbURI, tmpFile);
 		return manager.send(tmpFile, destFile);
 	}
 	
@@ -87,7 +88,7 @@ public class JDbBackup {
 		return manager;
 	}
 	
-	protected DBDumper getDBSaver(String dbType) {
+	protected DBDumper getDBDumper(String dbType) {
 		final DBDumper saver = SAVERS.get(dbType);
 		if (saver==null) {
 			throw new IllegalArgumentException("Unknown database type: "+dbType);

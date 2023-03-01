@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.function.Function;
 
 import com.fathzer.jdbbackup.DefaultPathDecoder;
 import com.fathzer.jdbbackup.DestinationManager;
@@ -24,8 +25,8 @@ public class FileManager implements DestinationManager<Path> {
 	}
 
 	@Override
-	public Path setDestinationPath(String fileName) {
-		return new File(DefaultPathDecoder.INSTANCE.decodePath(fileName)).toPath();
+	public Path setDestinationPath(String fileName, Function<String,CharSequence> extensionBuilder) {
+		return new File(DefaultPathDecoder.INSTANCE.decodePath(fileName, extensionBuilder)).toPath();
 	}
 
 	@Override

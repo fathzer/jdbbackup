@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 import com.fathzer.jdbbackup.DestinationManager;
 import com.fathzer.jdbbackup.utils.ProxySettings;
@@ -40,8 +41,8 @@ public class SFTPManager implements DestinationManager<SFTPDestination> {
 	}
 
 	@Override
-	public SFTPDestination setDestinationPath(String fileName) {
-		return new SFTPDestination(fileName);
+	public SFTPDestination setDestinationPath(String fileName, Function<String,CharSequence> extensionBuilder) {
+		return new SFTPDestination(fileName, extensionBuilder);
 	}
 
 	@Override
