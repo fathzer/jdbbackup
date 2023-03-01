@@ -8,26 +8,49 @@ import com.fathzer.jdbbackup.utils.Login;
 
 /** A DBSaver that saves MYSQL database.
  * <br>It requires mysqldump to be installed on the machine.
- * //TODO URI format documentation 
+ * <br>The URI format is mysql://<i>user</i>:<i>pwd</i>@<i>host</i>[:<i>port</i>]/<i>database</i>
+ * <br>Default port is 3306
  */
 public class MySQLDumper extends DBDumperFromProcess {
 	@Override
 	protected List<String> getCommand(URI params) {
+		if (!getScheme().equals(params.getScheme())) {
+			throw new IllegalArgumentException("Does not support "+params.getScheme()+" scheme");
+		}
+		final int port = getPort(params);
+		final String dbName = getDBName(params);
 		final Login login = Login.fromString(params.getUserInfo());  
-		if (isEmpty(params.getPath()) || isEmpty(params.getHost()) || params.getPort()<=0 || login==null) {
-			throw new IllegalArgumentException("Invalid parameters");
+		if (isEmpty(dbName) || isEmpty(params.getHost()) || port<=0 || login==null) {
+			throw new IllegalArgumentException("Invalid URI");
 		}
 		final List<String> commands = new ArrayList<>();
 		commands.add("mysqldump");
 		commands.add("--host="+params.getHost());
-		commands.add("--port="+params.getPort());
+		commands.add("--port="+port);
 		commands.add("--user="+login.getUser());
 		if (!isEmpty(login.getPassword())) {
 			commands.add("--password="+login.getPassword());
 		}
 		commands.add("--add-drop-database");
-		commands.add(params.getPath());
+		commands.add(dbName);
 		return commands;
+	}
+	
+	private int getPort(URI uri) {
+		int port = uri.getPort();
+		if (port==-1) {
+			port=3306;
+		}
+		return port;
+	}
+	
+	private String getDBName(URI uri) {
+		String result = uri.getPath();
+		if (result.startsWith("/")) {
+			// Remove initial /
+			result = result.substring(1);
+		}
+		return result;
 	}
 
 	@Override
