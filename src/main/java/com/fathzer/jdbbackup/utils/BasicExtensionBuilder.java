@@ -5,17 +5,17 @@ import java.util.function.Function;
 
 /** A default extension builder that does nothing if an extension is already present and adds one if not.
  */
-public class DefaultExtensionBuilder implements Function<String,CharSequence> {
+public class BasicExtensionBuilder implements Function<String,CharSequence> {
 	/** An instance that adds sql.gz extension.
 	 */
-	public static final DefaultExtensionBuilder INSTANCE = new DefaultExtensionBuilder("sql.gz");
+	public static final BasicExtensionBuilder INSTANCE = new BasicExtensionBuilder("sql.gz");
 	
 	private final String extension;
 	
 	/** Constructor.
 	 * @param extension The extension to add (with no period)
 	 */
-	public DefaultExtensionBuilder(String extension) {
+	public BasicExtensionBuilder(String extension) {
 		this.extension = extension;
 	}
 

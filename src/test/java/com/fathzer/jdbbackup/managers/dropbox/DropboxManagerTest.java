@@ -9,14 +9,14 @@ import org.junit.jupiter.api.Test;
 
 import com.dropbox.core.oauth.DbxCredential;
 import com.fathzer.jdbbackup.managers.dropbox.DropBoxManager.DropBoxDestination;
-import com.fathzer.jdbbackup.utils.DefaultExtensionBuilder;
+import com.fathzer.jdbbackup.utils.BasicExtensionBuilder;
 
 class DropboxManagerTest {
 
 	@Test
 	void test() {
 		DropBoxManager manager = new DropBoxManager();
-		DropBoxDestination path = manager.setDestinationPath("token/a/{d=MMyy}", DefaultExtensionBuilder.INSTANCE);
+		DropBoxDestination path = manager.setDestinationPath("token/a/{d=MMyy}", BasicExtensionBuilder.INSTANCE);
 		assertEquals("token", path.getToken());
 		assertEquals("/a/"+new SimpleDateFormat("MMyy").format(new Date())+".sql.gz", path.getPath());
 		//TODO Not sure this is a good idea to have a leading /

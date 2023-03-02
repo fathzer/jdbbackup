@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.function.Function;
 
-import com.fathzer.jdbbackup.utils.DefaultExtensionBuilder;
+import com.fathzer.jdbbackup.utils.BasicExtensionBuilder;
 
 /** A class able to dump a database to a file.
  */
@@ -16,7 +16,7 @@ public interface DBDumper {
 	 * @return a function
 	 */
 	default Function<String,CharSequence> getExtensionBuilder() {
-		return DefaultExtensionBuilder.INSTANCE;
+		return BasicExtensionBuilder.INSTANCE;
 	}
 	
 	/** Gets the scheme used in the URL to identify the type of database this saver can dump.

@@ -4,14 +4,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import com.fathzer.jdbbackup.managers.sftp.SFTPDestination;
-import com.fathzer.jdbbackup.utils.DefaultExtensionBuilder;
+import com.fathzer.jdbbackup.utils.BasicExtensionBuilder;
 
 class SftpTest {
 
 	@Test
 	void test() {
-		SFTPDestination m = new SFTPDestination("user:pwd@host:2222/path1/path2/filename", DefaultExtensionBuilder.INSTANCE);
+		SFTPDestination m = new SFTPDestination("user:pwd@host:2222/path1/path2/filename", BasicExtensionBuilder.INSTANCE);
 		assertEquals("user", m.getUser());
 		assertEquals("pwd", m.getPassword());
 		assertEquals("host", m.getHost());
@@ -22,7 +21,7 @@ class SftpTest {
 
 	@Test
 	void testDefault() {
-		SFTPDestination m = new SFTPDestination("user:pwd@host/filename", DefaultExtensionBuilder.INSTANCE);
+		SFTPDestination m = new SFTPDestination("user:pwd@host/filename", BasicExtensionBuilder.INSTANCE);
 		assertEquals("user", m.getUser());
 		assertEquals("pwd", m.getPassword());
 		assertEquals("host", m.getHost());
@@ -34,10 +33,10 @@ class SftpTest {
 	@Test
 	void testWrongDestPath() {
 		// Missing pwd
-		assertThrows(IllegalArgumentException.class, () -> new SFTPDestination("user@host/filename", DefaultExtensionBuilder.INSTANCE));
+		assertThrows(IllegalArgumentException.class, () -> new SFTPDestination("user@host/filename", BasicExtensionBuilder.INSTANCE));
 		// Missing login
-		assertThrows(IllegalArgumentException.class, () -> new SFTPDestination("host/filename", DefaultExtensionBuilder.INSTANCE));
+		assertThrows(IllegalArgumentException.class, () -> new SFTPDestination("host/filename", BasicExtensionBuilder.INSTANCE));
 		// Missing host
-		assertThrows(IllegalArgumentException.class, () -> new SFTPDestination("user:pwd/filename", DefaultExtensionBuilder.INSTANCE));
+		assertThrows(IllegalArgumentException.class, () -> new SFTPDestination("user:pwd/filename", BasicExtensionBuilder.INSTANCE));
 	}
 }

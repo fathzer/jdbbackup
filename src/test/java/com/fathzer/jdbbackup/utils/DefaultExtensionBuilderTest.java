@@ -8,7 +8,7 @@ class DefaultExtensionBuilderTest {
 
 	@Test
 	void test() {
-		DefaultExtensionBuilder eb = DefaultExtensionBuilder.INSTANCE;
+		BasicExtensionBuilder eb = BasicExtensionBuilder.INSTANCE;
 		assertTrue(eb.hasExtension("x/b.zip"));
 		assertFalse(eb.hasExtension("x.zip/b"));
 		assertEquals("a.sql.gz", eb.apply("a"));

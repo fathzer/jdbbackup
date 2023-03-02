@@ -4,8 +4,10 @@ import java.io.File;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import com.fathzer.jdbbackup.dumpers.DBDumperFromProcess;
+import com.fathzer.jdbbackup.utils.BasicExtensionBuilder;
 
 public final class FakeJavaDumper extends DBDumperFromProcess {
 	public static final List<String> CONTENT = Arrays.asList("Hello,","This is a fake db dump");
@@ -22,6 +24,13 @@ public final class FakeJavaDumper extends DBDumperFromProcess {
 		return args;
 	}
 	
+	
+	
+	@Override
+	public Function<String, CharSequence> getExtensionBuilder() {
+		return new BasicExtensionBuilder("txt.gz");
+	}
+
 	public static void main(String[] args) {
 		CONTENT.forEach(System.out::println);
 	}
