@@ -53,4 +53,9 @@ class ProxySettingsTest {
 		assertThrows(IllegalArgumentException.class, () -> ProxySettings.fromString("u:p@myHost{1}:3128"));
 	}
 
+	@Test
+	void loginTest() {
+		assertNull(Login.fromString(" "));
+		assertNull(Login.fromString(null));
+	}
 }

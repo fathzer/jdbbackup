@@ -17,7 +17,7 @@ public class Login {
 	 * @return The login or null if the input String is empty or null
 	 */
 	public static Login fromString(String userAndPwd) {
-		if (userAndPwd!=null && !userAndPwd.isEmpty()) {
+		if (userAndPwd!=null && !userAndPwd.trim().isEmpty()) {
 			final int index = userAndPwd.indexOf(':');
 			return index<0 ? new Login(userAndPwd, null) : new Login(userAndPwd.substring(0,index), userAndPwd.substring(index+1));
 		} else {
