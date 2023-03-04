@@ -50,7 +50,7 @@ public class ProxySettings {
 			}
 			result.login = Login.fromString(uri.getUserInfo());
 		} catch (URISyntaxException e) {
-			throw new IllegalArgumentException("argument should be of the form [user:pwd@]host:port");
+			throw new IllegalArgumentException("argument should be of the form [user:pwd@]host:port",e);
 		}
 		return result;
 	}
