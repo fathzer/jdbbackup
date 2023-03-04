@@ -1,11 +1,12 @@
 package com.fathzer.jdbbackup.managers.dropbox;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mockConstruction;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedConstruction;
 
 import com.dropbox.core.oauth.DbxCredential;
 import com.fathzer.jdbbackup.managers.dropbox.DropBoxManager.DropBoxDestination;
@@ -16,9 +17,11 @@ class DropboxManagerTest {
 	@Test
 	void test() {
 		DropBoxManager manager = new DropBoxManager();
-		DropBoxDestination path = manager.validate("token/a/{d=MMyy}", BasicExtensionBuilder.INSTANCE);
-		assertEquals("token", path.getToken());
-		assertEquals("/a/"+new SimpleDateFormat("MMyy").format(new Date())+".sql.gz", path.getPath());
+		try (MockedConstruction<Date> mock = mockConstruction(Date.class)) {
+			DropBoxDestination path = manager.validate("token/a/{d=MMyy}", BasicExtensionBuilder.INSTANCE);
+			assertEquals("token", path.getToken());
+			assertEquals("/a/0170.sql.gz", path.getPath());
+		}
 	}
 
 	@Test

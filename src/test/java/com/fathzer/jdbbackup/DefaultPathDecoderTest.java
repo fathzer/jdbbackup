@@ -17,6 +17,7 @@ class DefaultPathDecoderTest {
 		try (MockedConstruction<Date> mock = mockConstruction(Date.class)) {
 			// instances of Date used by the PathDecoder will be replaced by mockito with a Date that corresponds to 1/1/1970.
 			assertEquals("y1970/m01", DefaultPathDecoder.INSTANCE.decodePath("y{d=YYYY}/m{d=MM}"));
+			assertEquals("197001", DefaultPathDecoder.INSTANCE.decodePath("{d=YYYY}{d=MM}"));
 		}
 	}
 }
