@@ -2,6 +2,10 @@ package com.fathzer.jdbbackup.utils;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.SocketAddress;
+
 import org.junit.jupiter.api.Test;
 
 class ProxySettingsTest {
@@ -41,10 +45,17 @@ class ProxySettingsTest {
 		assertEquals(3128, settings.getPort());
 		assertEquals("host:3128", settings.toString());
 		
+		InetSocketAddress proxy = (InetSocketAddress) ProxySettings.fromString("127.0.0.1:3128").toProxy().address();
+		assertEquals(3128, proxy.getPort());
+		assertArrayEquals(new byte[] {127,0,0,1}, proxy.getAddress().getAddress());
+		
 		// Empty or null String
 		assertNull(ProxySettings.fromString(" "));
 		assertNull(ProxySettings.fromString(null));
-		
+	}
+
+	@Test
+	void testIllegal() {
 		// Illegal arguments
 		assertThrows(IllegalArgumentException.class, () -> ProxySettings.fromString("host"));
 		assertThrows(IllegalArgumentException.class, () -> ProxySettings.fromString("host:3128:11"));
