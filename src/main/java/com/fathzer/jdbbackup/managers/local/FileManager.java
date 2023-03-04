@@ -25,7 +25,7 @@ public class FileManager implements DestinationManager<Path> {
 	}
 
 	@Override
-	public Path setDestinationPath(String fileName, Function<String,CharSequence> extensionBuilder) {
+	public Path validate(String fileName, Function<String,CharSequence> extensionBuilder) {
 		return new File(DefaultPathDecoder.INSTANCE.decodePath(fileName, extensionBuilder)).toPath();
 	}
 

@@ -41,7 +41,7 @@ public class SFTPManager implements DestinationManager<SFTPDestination> {
 	}
 
 	@Override
-	public SFTPDestination setDestinationPath(String fileName, Function<String,CharSequence> extensionBuilder) {
+	public SFTPDestination validate(String fileName, Function<String,CharSequence> extensionBuilder) {
 		return new SFTPDestination(fileName, extensionBuilder);
 	}
 

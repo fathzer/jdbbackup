@@ -10,6 +10,7 @@ import com.dropbox.core.DbxAppInfo;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.oauth.DbxCredential;
 import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.CommitInfo;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.UploadBuilder;
 import com.dropbox.core.v2.files.WriteMode;
@@ -18,7 +19,7 @@ import com.fathzer.jdbbackup.DefaultPathDecoder;
 import com.fathzer.jdbbackup.DestinationManager;
 
 /** A destination manager that saves the backups to a dropbox account.
- * <br>Destination paths have the following format dropbox://<i>token</i>/<i>fileName</i>
+ * <br>Destination paths have the following format dropbox://<i>token</i>/<i>filePath</i>
  */
 public class DropBoxManager extends DropBoxBase implements DestinationManager<DropBoxManager.DropBoxDestination> {
 
@@ -63,7 +64,7 @@ public class DropBoxManager extends DropBoxBase implements DestinationManager<Dr
 	}
 	
 	@Override
-	public DropBoxDestination setDestinationPath(final String fileName, Function<String,CharSequence> extensionBuilder) {
+	public DropBoxDestination validate(final String fileName, Function<String,CharSequence> extensionBuilder) {
 		int index = fileName.indexOf(URI_PATH_SEPARATOR);
 		if (index<=0) {
 			throw new IllegalArgumentException("Unable to locate token. "+"FileName should conform to the format access_token/path");
@@ -74,10 +75,18 @@ public class DropBoxManager extends DropBoxBase implements DestinationManager<Dr
 		if (dest.path.isEmpty()) {
 			throw new IllegalArgumentException("Unable to locate destination path. Path should conform to the format access_token/path");
 		}
+		dest.path = DefaultPathDecoder.INSTANCE.decodePath(dest.path, extensionBuilder);
 		if (dest.path.charAt(0)!=URI_PATH_SEPARATOR) {
+			// Dropbox requires path that starts with a /
 			dest.path = URI_PATH_SEPARATOR+dest.path;
 		}
-		dest.path = DefaultPathDecoder.INSTANCE.decodePath(dest.path, extensionBuilder);
+		// Check destination with Dropbox constraint on path
+		try {
+			CommitInfo.newBuilder(dest.path);
+		} catch (IllegalArgumentException e) {
+			// Throw a more explicit exception
+			throw new IllegalArgumentException("The path does not match Dropbox path pattern",e);
+		}
 		return dest;
 	}
 

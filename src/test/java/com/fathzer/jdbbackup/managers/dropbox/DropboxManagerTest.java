@@ -16,10 +16,9 @@ class DropboxManagerTest {
 	@Test
 	void test() {
 		DropBoxManager manager = new DropBoxManager();
-		DropBoxDestination path = manager.setDestinationPath("token/a/{d=MMyy}", BasicExtensionBuilder.INSTANCE);
+		DropBoxDestination path = manager.validate("token/a/{d=MMyy}", BasicExtensionBuilder.INSTANCE);
 		assertEquals("token", path.getToken());
 		assertEquals("/a/"+new SimpleDateFormat("MMyy").format(new Date())+".sql.gz", path.getPath());
-		//TODO Not sure this is a good idea to have a leading /
 	}
 
 	@Test

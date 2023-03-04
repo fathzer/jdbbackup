@@ -74,7 +74,7 @@ public class JDbBackup {
 	private <T> String backup(ProxySettings proxySettings, URI dbURI, DestinationManager<T> manager, Destination destination, File tmpFile) throws IOException {
 		manager.setProxy(proxySettings);
 		DBDumper dumper = getDBDumper(dbURI.getScheme());
-		T destFile = manager.setDestinationPath(destination.getPath(), dumper.getExtensionBuilder());
+		T destFile = manager.validate(destination.getPath(), dumper.getExtensionBuilder());
 		dumper.save(dbURI, tmpFile);
 		return manager.send(tmpFile, destFile);
 	}
