@@ -22,8 +22,8 @@ public interface DestinationManager<T> {
 	 */
 	String getProtocol();
 
-	/** Tests whether the destination of next backup is valid. 
-	 * @param path The path as it is entered in the command line (example:"{d=YYYY}/baseName")
+	/** Tests whether a destination is valid. 
+	 * @param path The destination path.
 	 * @param extensionBuilder a function that transforms a path that may contain or not an file extension (like .gz) to a path with the extension (To simplify, it adds the extension if needed).
 	 * @return An internal representation of where the backup will be saved.
 	 * @throws IllegalArgumentException If the path is not valid.
@@ -33,7 +33,7 @@ public interface DestinationManager<T> {
 	/** Sends the backup file to its final destination at the path passed in {@link #setDestinationPath}.
 	 * <br>It is guaranteed that {@link DestinationManager#setProxy(ProxyOptions)} will be called before this method.
 	 * @param file The temporary file to save
-	 * @param destination The destination that was returned by {@link #setDestinationPath(String)}
+	 * @param destination The destination that was returned by {@link #validate(URI, Function)}
 	 * @return a message indicating where the file was sent
 	 * @throws IOException If an error occurs while sending the file
 	 * @see #setProxy(ProxyOptions)

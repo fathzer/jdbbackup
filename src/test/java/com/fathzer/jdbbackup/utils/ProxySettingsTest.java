@@ -3,8 +3,6 @@ package com.fathzer.jdbbackup.utils;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.InetSocketAddress;
-import java.net.Proxy;
-import java.net.SocketAddress;
 
 import org.junit.jupiter.api.Test;
 

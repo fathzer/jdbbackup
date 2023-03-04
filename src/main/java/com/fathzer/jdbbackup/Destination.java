@@ -6,7 +6,7 @@ class Destination {
 	private String type;
 	private String path;
 	
-	public Destination(String dest) {
+	Destination(String dest) {
 		if (dest==null) {
 			throw new IllegalArgumentException();
 		}
