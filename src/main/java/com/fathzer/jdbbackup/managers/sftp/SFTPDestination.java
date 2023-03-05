@@ -15,7 +15,7 @@ public class SFTPDestination {
 	private String filename;
 
 	/** Constructor.
-	 * @param destination The destination in its string format: <i>user:pwd@host[:port][/path]/filename</i>
+	 * @param destination The destination in its string format: <i>user:pwd[@host[:port]][/path]/filename</i>
 	 */
 	public SFTPDestination(String destination, Function<String,CharSequence> extensionBuilder) {
 		int index = destination.indexOf(URI_PATH_SEPARATOR);
@@ -29,10 +29,15 @@ public class SFTPDestination {
 	private void parseConnectionData(String fileName, String cData) {
 		int index = cData.indexOf('@');
 		if (index < 0) {
+			this.host = "127.0.0.1";
+			this.port = 22;
+			parseUserData(fileName, cData);
+		} else if (index==cData.length()-1) {
 			badFileName(fileName);
+		} else {
+			parseUserData(fileName, cData.substring(0, index));
+			parseHostData(fileName, cData.substring(index + 1));
 		}
-		parseUserData(fileName, cData.substring(0, index));
-		parseHostData(fileName, cData.substring(index + 1));
 	}
 
 	private void parseUserData(String fileName, String userData) {
@@ -45,37 +50,32 @@ public class SFTPDestination {
 	}
 
 	private void parseHostData(String fileName, String hostData) {
-		if (hostData.isEmpty()) {
-			this.host = "127.0.0.1";
+		int index = hostData.indexOf(':');
+		if (index < 0) {
 			this.port = 22;
+			this.host = hostData;
 		} else {
-			int index = hostData.indexOf(':');
-			if (index < 0) {
-				this.port = 22;
-				this.host = hostData;
-			} else {
-				this.host = hostData.substring(0, index);
-				try {
-					this.port = Integer.parseInt(hostData.substring(index + 1));
-				} catch (NumberFormatException e) {
-					badFileName(fileName);
-				}
+			this.host = hostData.substring(0, index);
+			try {
+				this.port = Integer.parseInt(hostData.substring(index + 1));
+			} catch (NumberFormatException e) {
+				badFileName(fileName);
 			}
 		}
 	}
 
 	private void parsePath(String fileName, String path, Function<String,CharSequence> extensionBuilder) {
-		path = DefaultPathDecoder.INSTANCE.decodePath(path, extensionBuilder);
 		int index = path.lastIndexOf(URI_PATH_SEPARATOR);
 		if (index < 0) {
 			this.filename = path;
 		} else {
-			this.path = path.substring(0, index);
+			this.path = DefaultPathDecoder.INSTANCE.decodePath(path.substring(0, index),s->s);
 			this.filename = path.substring(index + 1);
 		}
 		if (filename.isEmpty()) {
 			badFileName(fileName);
 		}
+		this.filename = DefaultPathDecoder.INSTANCE.decodePath(this.filename, extensionBuilder);
 	}
 
 	private void badFileName(String fileName) {
