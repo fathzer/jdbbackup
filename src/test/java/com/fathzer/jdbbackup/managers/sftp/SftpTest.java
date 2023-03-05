@@ -38,5 +38,8 @@ class SftpTest {
 		assertThrows(IllegalArgumentException.class, () -> new SFTPDestination("host/filename", BasicExtensionBuilder.INSTANCE));
 		// Missing host
 		assertThrows(IllegalArgumentException.class, () -> new SFTPDestination("user:pwd/filename", BasicExtensionBuilder.INSTANCE));
+		assertThrows(IllegalArgumentException.class, () -> new SFTPDestination("filename", BasicExtensionBuilder.INSTANCE));
+		// Invalid port
+		assertThrows(IllegalArgumentException.class, () -> new SFTPDestination("user:pwd@host:x/filename", BasicExtensionBuilder.INSTANCE));
 	}
 }
