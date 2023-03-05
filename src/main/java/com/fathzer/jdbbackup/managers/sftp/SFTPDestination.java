@@ -79,7 +79,7 @@ public class SFTPDestination {
 	}
 
 	private void badFileName(String fileName) {
-		throw new IllegalArgumentException(fileName + " does not match format user:pwd@host[:port][/path]/filename");
+		throw new IllegalArgumentException(fileName + " does not match format user:pwd[@host[:port]][/path]/filename");
 	}
 
 	public String getUser() {

@@ -1,7 +1,10 @@
 package com.fathzer.jdbbackup;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -76,7 +79,9 @@ public class JDbBackup {
 		DBDumper dumper = getDBDumper(dbURI.getScheme());
 		T destFile = manager.validate(destination.getPath(), dumper.getExtensionBuilder());
 		dumper.save(dbURI, tmpFile);
-		return manager.send(tmpFile, destFile);
+		try (InputStream in = new BufferedInputStream(new FileInputStream(tmpFile))) {
+			return manager.send(in, tmpFile.length(), destFile);
+		}
 	}
 	
 	protected <T> DestinationManager<T> getDestinationManager(Destination destination) {

@@ -1,7 +1,5 @@
 package com.fathzer.jdbbackup.managers.dropbox;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Function;
@@ -42,12 +40,12 @@ public class DropBoxManager extends DropBoxBase implements DestinationManager<Dr
 	}
 
 	@Override
-	public String send(final File file, DropBoxDestination dest) throws IOException {
+	public String send(final InputStream in, long size, DropBoxDestination dest) throws IOException {
 		DbxClientV2 client = new DbxClientV2(getConfig(), getCredential(dest.token));
-		try (InputStream in = new FileInputStream(file)) {
-			UploadBuilder builder = client.files().uploadBuilder(dest.path);
-			builder.withMode(WriteMode.OVERWRITE);
-			FileMetadata data = builder.uploadAndFinish(in, file.length());
+		UploadBuilder builder = client.files().uploadBuilder(dest.path);
+		builder.withMode(WriteMode.OVERWRITE);
+		try {
+			FileMetadata data = builder.uploadAndFinish(in, size);
 			return "Sent to Dropbox: "+data.getPathDisplay()+" (rev: "+data.getRev()+")";
 		} catch (DbxException e) {
 			throw new IOException(e);

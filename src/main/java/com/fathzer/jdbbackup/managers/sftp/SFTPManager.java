@@ -1,7 +1,5 @@
 package com.fathzer.jdbbackup.managers.sftp;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -46,7 +44,7 @@ public class SFTPManager implements DestinationManager<SFTPDestination> {
 	}
 
 	@Override
-	public String send(File file, SFTPDestination dest) throws IOException {
+	public String send(InputStream in, long size, SFTPDestination dest) throws IOException {
 		try {
 			final JSch jsch = new JSch();
 			final Session session = jsch.getSession(dest.getUser(), dest.getHost(), dest.getPort());
@@ -59,7 +57,9 @@ public class SFTPManager implements DestinationManager<SFTPDestination> {
 			session.setConfig(config);
 			session.connect();
 			try {
-				return send(session, dest, file);
+				send(session, dest, in);
+				final String fullPath = dest.getPath() == null ? dest.getFilename() : dest.getPath() + URI_PATH_SEPARATOR + dest.getFilename();
+				return "Sent to " + dest.getUser() + "@" + dest.getHost() + ": " + fullPath;
 			} finally {
 				session.disconnect();
 			}
@@ -68,7 +68,7 @@ public class SFTPManager implements DestinationManager<SFTPDestination> {
 		}
 	}
 
-	String send(final Session session, SFTPDestination dest, File file) throws JSchException, IOException {
+	void send(final Session session, SFTPDestination dest, InputStream in) throws JSchException, IOException {
 		ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
 		channel.connect();
 		try {
@@ -76,11 +76,7 @@ public class SFTPManager implements DestinationManager<SFTPDestination> {
 				mkdirs(channel, dest.getPath());
 				channel.cd(dest.getPath());
 			}
-			try (InputStream stream = new FileInputStream(file)) {
-				channel.put(stream, dest.getFilename());
-			}
-			final String fullPath = dest.getPath() == null ? dest.getFilename() : dest.getPath() + URI_PATH_SEPARATOR + dest.getFilename();
-			return "Sent to " + dest.getUser() + "@" + dest.getHost() + ": " + fullPath;
+			channel.put(in, dest.getFilename());
 		} catch (SftpException e) {
 			throw new IOException(e);
 		} finally {

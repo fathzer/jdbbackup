@@ -2,6 +2,7 @@ package com.fathzer.jdbbackup.managers.local;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -30,8 +31,8 @@ public class FileManager implements DestinationManager<Path> {
 	}
 
 	@Override
-	public String send(File tmpFile, Path dest) throws IOException {
-	    Files.copy(tmpFile.toPath(), dest, StandardCopyOption.REPLACE_EXISTING);
+	public String send(InputStream in, long size, Path dest) throws IOException {
+	    Files.copy(in, dest, StandardCopyOption.REPLACE_EXISTING);
 		return "Saved to: "+dest.toFile().getAbsolutePath();
 	}
 
