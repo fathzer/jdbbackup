@@ -1,7 +1,7 @@
 package com.fathzer.jdbbackup.managers.sftp;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.*;
 
 import java.util.Date;
 
@@ -10,7 +10,7 @@ import org.mockito.MockedConstruction;
 
 import com.fathzer.jdbbackup.utils.BasicExtensionBuilder;
 
-class SftpTest {
+class SFTPDestinationTest {
 
 	@Test
 	void test() {

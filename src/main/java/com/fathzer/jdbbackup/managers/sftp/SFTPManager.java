@@ -68,7 +68,7 @@ public class SFTPManager implements DestinationManager<SFTPDestination> {
 		}
 	}
 
-	private String send(final Session session, SFTPDestination dest, File file) throws JSchException, IOException {
+	String send(final Session session, SFTPDestination dest, File file) throws JSchException, IOException {
 		ChannelSftp channel = (ChannelSftp) session.openChannel("sftp");
 		channel.connect();
 		try {
