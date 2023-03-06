@@ -31,7 +31,7 @@ public class DropBoxTokenCmd extends DropBoxBase implements Callable<Integer> {
 	}
 
 	private void getToken() {
-	    DbxAppInfo appInfo = dbxAppInfoProvider.get();
+	    DbxAppInfo appInfo = getAppInfo();
 	    DbxWebAuth auth = new DbxWebAuth(getConfig(), appInfo);
 	    DbxWebAuth.Request authRequest = DbxWebAuth.newRequestBuilder()
 	             .withNoRedirect()

@@ -9,6 +9,7 @@ import java.net.PasswordAuthentication;
 import java.net.Proxy;
 import java.util.MissingResourceException;
 import java.util.Properties;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.dropbox.core.DbxAppInfo;
@@ -20,25 +21,35 @@ import com.fathzer.jdbbackup.utils.ProxySettings;
 /** Common component between {@link com.fathzer.jdbbackup.managers.dropbox.DropBoxManager} and {@link com.fathzer.jdbbackup.managers.dropbox.DropBoxTokenCmd}
  */
 public class DropBoxBase {
-	static final String REFRESH_PREFIX = "refresh-";
+	protected static final String REFRESH_PREFIX = "refresh-";
 	private static final String NAME = "jDbBackup";
-	static Supplier<DbxAppInfo> dbxAppInfoProvider = () -> {
-		try (InputStream in = DropBoxBase.class.getResourceAsStream("keys.properties")) {
+
+	/** A function that build a DbxAppInfo instance from a resource file path. The properties resource file should contain
+	 * <i>appKey</i> and <i>appSecret</i> keys.
+	 */
+	public static final Function<String,DbxAppInfo> RESOURCE_PROPERTY_APP_INFO_BUILDER = resName -> {
+		try (InputStream in = DropBoxBase.class.getResourceAsStream(resName)) {
 			final Properties properties = new Properties();
 			properties.load(in);
-			String key = properties.getProperty("appKey");
-			String secret = properties.getProperty("appSecret");
-			if (key.length()==0 || secret.length()==0) {
-				throw new MissingResourceException("App key and secret not provided","","");
-			}
+			String key = getKey(properties,resName, "appKey");
+			String secret = getKey(properties,resName, "appSecret");
 			return new DbxAppInfo(key, secret);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	};
 	
+	private static String getKey(Properties properties, String resName, String key) {
+		final String value = properties.getProperty(key);
+		if (value==null || value.isBlank()) {
+			throw new MissingResourceException("Property file is incorrect",resName,key);
+		}
+		return value;
+	}
+	
 	private DbxRequestConfig config;
 	private ProxySettings proxySettings;
+	private Supplier<DbxAppInfo> dbxAppInfoProvider = () -> RESOURCE_PROPERTY_APP_INFO_BUILDER.apply("keys.properties");
 
 	public void setProxy(final ProxySettings options) {
 		this.proxySettings = options;
@@ -47,6 +58,10 @@ public class DropBoxBase {
 	
 	protected ProxySettings getProxySettings() {
 		return this.proxySettings;
+	}
+	
+	protected DbxAppInfo getAppInfo() {
+		return dbxAppInfoProvider.get();
 	}
 	
 	protected DbxRequestConfig getConfig() {
@@ -76,8 +91,9 @@ public class DropBoxBase {
 	 * <br>By default, the library uses the jdbbackup application's credential stored in keys.properties resource file.
 	 * <br>You can switch to another application of your choice by passing another supplier to this method.
 	 * @param dbxAppInfoProvider The new application credentials supplier
+	 * @see DropBoxBase#RESOURCE_PROPERTY_APP_INFO_BUILDER
 	 */
-	public static void setDbxAppInfoSupplier(Supplier<DbxAppInfo> dbxAppInfoProvider) {
-		DropBoxBase.dbxAppInfoProvider = dbxAppInfoProvider;
+	public void setDbxAppInfoSupplier(Supplier<DbxAppInfo> dbxAppInfoProvider) {
+		this.dbxAppInfoProvider = dbxAppInfoProvider;
 	}
 }

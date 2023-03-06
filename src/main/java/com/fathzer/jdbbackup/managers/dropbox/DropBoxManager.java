@@ -54,7 +54,7 @@ public class DropBoxManager extends DropBoxBase implements DestinationManager<Dr
 	
 	DbxCredential getCredential(String token) {
 		if (token.startsWith(REFRESH_PREFIX)) {
-			final DbxAppInfo info = dbxAppInfoProvider.get();
+			final DbxAppInfo info = getAppInfo();
 			return new DbxCredential("fake", 0L, token.substring(REFRESH_PREFIX.length()), info.getKey(), info.getSecret());
 		} else {
 			return new DbxCredential(token);
