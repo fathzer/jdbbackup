@@ -85,6 +85,24 @@ class SFTPManagerTest {
 				verify(channel).disconnect();
 			}
 		}
+		
+		// Test setProxy accept null with no exception and clears the proxy
+		try (MockedConstruction<ProxyHTTP> mock = mockConstruction(ProxyHTTP.class)) {
+			manager.setProxy(null);
+			assert(mock.constructed().isEmpty());
+
+			SFTPDestination dest = manager.validate("user:pwd//filename",x->x);
+			final Session session = mock(Session.class);
+			final ChannelSftp channel = mock(ChannelSftp.class);
+			when(session.openChannel("sftp")).thenReturn(channel);
+			when(channel.ls("/")).thenReturn(new Vector<>());
+			try (MockedConstruction<JSch> mockJSch = mockConstruction(JSch.class, (jsch , context) -> {
+				when(jsch.getSession("user","127.0.0.1",22)).thenReturn(session);
+			})) {
+				manager.send(null, 0, dest);
+				verify(session, never()).setProxy(any(ProxyHTTP.class));
+			}
+		}
 	}
 
 	private LsEntry getLSEntry(String fileName, boolean isDir) {
