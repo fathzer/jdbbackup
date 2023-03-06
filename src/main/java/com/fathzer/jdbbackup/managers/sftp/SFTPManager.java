@@ -30,11 +30,13 @@ public class SFTPManager implements DestinationManager<SFTPDestination> {
 
 	@Override
 	public void setProxy(ProxySettings options) {
-		if (options.getHost() != null) {
+		if (options != null) {
 			proxy = new ProxyHTTP(options.getHost(), options.getPort());
 			if (options.getLogin() != null) {
 				proxy.setUserPasswd(options.getLogin().getUser(), options.getLogin().getPassword());
 			}
+		} else {
+			proxy = null;
 		}
 	}
 

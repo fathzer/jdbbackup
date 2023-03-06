@@ -46,7 +46,7 @@ class SFTPManagerTest {
 			verify(channel, never()).mkdir("./path");
 			verify(channel).ls("./path/");
 			verify(channel).mkdir("./path/nonexisting");
-//			verify(channel).cd("./path/nonexisting"); // FIXME
+			verify(channel).cd("path/nonexisting");
 			verify(channel).put((InputStream)null, "filename");
 			verify(channel).disconnect();
 		}

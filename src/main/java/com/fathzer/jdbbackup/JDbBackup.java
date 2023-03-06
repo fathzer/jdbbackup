@@ -48,9 +48,12 @@ public class JDbBackup {
 		}
 		final Destination dest = new Destination(destination);
 		final DestinationManager<?> manager = getDestinationManager(dest);
+		if (proxySettings!=null) {
+			manager.setProxy(proxySettings);
+		}
 		final File tmpFile = createTempFile();
 		try {
-			return backup(proxySettings, srcURI, manager, dest, tmpFile);
+			return backup(srcURI, manager, dest, tmpFile);
 		} finally {
 			Files.delete(tmpFile.toPath());
 		}
@@ -74,8 +77,7 @@ public class JDbBackup {
 		return tmpFile;
 	}
 	
-	private <T> String backup(ProxySettings proxySettings, URI dbURI, DestinationManager<T> manager, Destination destination, File tmpFile) throws IOException {
-		manager.setProxy(proxySettings);
+	private <T> String backup(URI dbURI, DestinationManager<T> manager, Destination destination, File tmpFile) throws IOException {
 		DBDumper dumper = getDBDumper(dbURI.getScheme());
 		T destFile = manager.validate(destination.getPath(), dumper.getExtensionBuilder());
 		dumper.save(dbURI, tmpFile);
