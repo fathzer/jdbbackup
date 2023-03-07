@@ -1,1 +1,1 @@
-com.fathzer.jdbbackup.dumper.FakeJavaDumper
+com.fathzer.jdbbackup.dumpers.FakeJavaDumper
