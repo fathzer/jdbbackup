@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
@@ -53,7 +52,7 @@ class JDBBackupTest {
 		assertTrue(b.tmpFile==null || !b.tmpFile.exists());
 		
 		FakeJavaDumper.shouldFail = false;
-		URI db = URI.create("java://test");
+		String db = "java://";
 		b.backup(null, db, dest);
 		assertTrue(b.tmpFile==null || !b.tmpFile.exists());
 		
@@ -69,7 +68,7 @@ class JDBBackupTest {
 	void testKo() throws IOException {
 		final ObservableJDbBackup b = new ObservableJDbBackup();
 		String dest = "file://"+DEST_PATH;
-		URI db = URI.create("java://test");
+		String db = "java://";
 		FakeJavaDumper.shouldFail = true;
 		SimpleLogger log = (SimpleLogger) LoggerFactory.getLogger(com.fathzer.jdbbackup.dumper.FakeJavaDumper.class);
 		final int previous = LogUtils.setLevel(log, "off");

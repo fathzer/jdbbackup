@@ -6,6 +6,9 @@ class Destination {
 	private String type;
 	private String path;
 	
+	/** Constructor.
+	 * @param dest The string representation of the destination. Should have the format <i>scheme</i>://<i>content</i> where <i>scheme</i> should not contain any colon.
+	 */
 	Destination(String dest) {
 		if (dest==null) {
 			throw new IllegalArgumentException();

@@ -15,7 +15,6 @@ import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.DbxUserFilesRequests;
 import com.dropbox.core.v2.files.FileMetadata;
 import com.dropbox.core.v2.files.UploadBuilder;
-import com.dropbox.core.v2.files.UploadErrorException;
 import com.dropbox.core.v2.files.WriteMode;
 import com.fathzer.jdbbackup.managers.dropbox.DropBoxManager.DropBoxDestination;
 import com.fathzer.jdbbackup.utils.BasicExtensionBuilder;

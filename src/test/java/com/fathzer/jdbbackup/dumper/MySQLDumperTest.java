@@ -2,7 +2,6 @@ package com.fathzer.jdbbackup.dumper;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.net.URI;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,7 @@ import com.fathzer.jdbbackup.dumpers.MySQLDumper;
 class MySQLDumperTest {
 	private static class MySQLObservableDumper extends MySQLDumper {
 		@Override
-		public List<String> getCommand(URI params) {
+		public List<String> getCommand(String params) {
 			return super.getCommand(params);
 		}
 	}
@@ -21,22 +20,22 @@ class MySQLDumperTest {
 	void test() {
 		MySQLObservableDumper d = new MySQLObservableDumper();
 		assertEquals("mysql",d.getScheme());
-		List<String> command = d.getCommand(URI.create("mysql://u:p@host:4502/db/more"));
+		List<String> command = d.getCommand("mysql://u:p@host:4502/db/more");
 		expect(command, "u","p","host",4502,"db/more");
-		command = d.getCommand(URI.create("mysql://user:pwd@localhost/db"));
+		command = d.getCommand("mysql://user:pwd@localhost/db");
 		expect(command, "user","pwd","localhost",3306,"db");
 		
-		final URI wrongPort = URI.create("mysql://u:p@host:-5/db/more");
+		final String wrongPort = "mysql://u:p@host:-5/db/more";
 		assertThrows(IllegalArgumentException.class, () -> d.getCommand(wrongPort));
-		final URI noLogin = URI.create("mysql://host:-5/db/more");
+		final String noLogin = "mysql://host:-5/db/more";
 		assertThrows(IllegalArgumentException.class, () -> d.getCommand(noLogin));
-		final URI noDb = URI.create("mysql://u:p@host");
+		final String noDb = "mysql://u:p@host";
 		assertThrows(IllegalArgumentException.class, () -> d.getCommand(noDb));
-		final URI noPassword = URI.create("mysql://u@host/db");
+		final String noPassword = "mysql://u@host/db";
 		assertThrows(IllegalArgumentException.class, () -> d.getCommand(noPassword));
-		final URI noUser = URI.create("mysql://:p@host/db");
+		final String noUser = "mysql://:p@host/db";
 		assertThrows(IllegalArgumentException.class, () -> d.getCommand(noUser));
-		final URI wrongProtocol = URI.create("http://u:p@host/db");
+		final String wrongProtocol = "http://u:p@host/db";
 		assertThrows(IllegalArgumentException.class, () -> d.getCommand(wrongProtocol));
 	}
 	

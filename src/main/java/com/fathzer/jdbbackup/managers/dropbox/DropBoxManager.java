@@ -42,7 +42,6 @@ public class DropBoxManager extends DropBoxBase implements DestinationManager<Dr
 	@Override
 	public String send(final InputStream in, long size, DropBoxDestination dest) throws IOException {
 		DbxClientV2 client = new DbxClientV2(getConfig(), getCredential(dest.token));
-System.out.println(dest.path);
 		UploadBuilder builder = client.files().uploadBuilder(dest.path);
 		builder.withMode(WriteMode.OVERWRITE);
 		try {

@@ -13,7 +13,8 @@ import com.fathzer.jdbbackup.utils.Login;
  */
 public class MySQLDumper extends DBDumperFromProcess {
 	@Override
-	protected List<String> getCommand(URI params) {
+	protected List<String> getCommand(String source) {
+		URI params = URI.create(source);
 		if (!getScheme().equals(params.getScheme())) {
 			throw new IllegalArgumentException("Does not support "+params.getScheme()+" scheme");
 		}

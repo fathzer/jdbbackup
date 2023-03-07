@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.HashMap;
@@ -42,8 +41,8 @@ public class JDbBackup {
 		super();
 	}
 	
-	public String backup(ProxySettings proxySettings, URI srcURI, String destination) throws IOException {
-		if (srcURI==null || destination==null) {
+	public String backup(ProxySettings proxySettings, String source, String destination) throws IOException {
+		if (source==null || destination==null) {
 			throw new IllegalArgumentException();
 		}
 		final Destination dest = new Destination(destination);
@@ -53,7 +52,7 @@ public class JDbBackup {
 		}
 		final File tmpFile = createTempFile();
 		try {
-			return backup(srcURI, manager, dest, tmpFile);
+			return backup(source, manager, dest, tmpFile);
 		} finally {
 			Files.delete(tmpFile.toPath());
 		}
@@ -77,8 +76,8 @@ public class JDbBackup {
 		return tmpFile;
 	}
 	
-	private <T> String backup(URI dbURI, DestinationManager<T> manager, Destination destination, File tmpFile) throws IOException {
-		DBDumper dumper = getDBDumper(dbURI.getScheme());
+	private <T> String backup(String dbURI, DestinationManager<T> manager, Destination destination, File tmpFile) throws IOException {
+		DBDumper dumper = getDBDumper(new Destination(dbURI).getProtocol());
 		T destFile = manager.validate(destination.getPath(), dumper.getExtensionBuilder());
 		dumper.save(dbURI, tmpFile);
 		try (InputStream in = new BufferedInputStream(new FileInputStream(tmpFile))) {

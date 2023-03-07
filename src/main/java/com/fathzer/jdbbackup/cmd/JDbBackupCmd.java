@@ -1,7 +1,6 @@
 package com.fathzer.jdbbackup.cmd;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.concurrent.Callable;
 
 import com.fathzer.jdbbackup.JDbBackup;
@@ -17,8 +16,8 @@ import picocli.CommandLine.Parameters;
  */
 @Command(name="java com.fathzer.jdbbackup.cmd.JDbBackupCmd", mixinStandardHelpOptions = true, description = "Saves a database to a destination", usageHelpWidth = 160)
 public class JDbBackupCmd implements Callable<Integer> {
-	@Parameters(index="0", description="Data base url (for example mysql://user:pwd@host:port/db")
-    private URI db;
+	@Parameters(index="0", description="Data base address (for example mysql://user:pwd@host:port/db")
+    private String db;
 	@Parameters(index="1", description = "Destination (example sftp://user:pwd@host/filepath)")
     private String dest;
 	@Option(names={"-p","--proxy"}, description="The proxy used for the backup, format is [user[:pwd]@]host:port", converter = ProxySettingsConverter.class)

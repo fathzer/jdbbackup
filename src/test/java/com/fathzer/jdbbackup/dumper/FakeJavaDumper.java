@@ -1,7 +1,6 @@
 package com.fathzer.jdbbackup.dumper;
 
 import java.io.File;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -18,7 +17,7 @@ public final class FakeJavaDumper extends DBDumperFromProcess {
 	}
 
 	@Override
-	protected List<String> getCommand(URI params) {
+	protected List<String> getCommand(String params) {
 		List<String> args = shouldFail ? Arrays.asList("java",FakeJavaDumper.class.getName()) :
 			Arrays.asList("java","-cp","./target/classes"+File.pathSeparator+"./target/test-classes",FakeJavaDumper.class.getName());
 		return args;
