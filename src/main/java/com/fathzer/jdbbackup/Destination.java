@@ -7,7 +7,7 @@ class Destination {
 	private String path;
 	
 	/** Constructor.
-	 * @param dest The string representation of the destination. Should have the format <i>scheme</i>://<i>content</i> where <i>scheme</i> should not contain any colon.
+	 * @param dest The string representation of the destination. Should have the format <i>scheme</i>://[<i>path</i>] where <i>scheme</i> should not contain any colon.
 	 */
 	Destination(String dest) {
 		if (dest==null) {
@@ -24,12 +24,9 @@ class Destination {
 			}
 		}
 		this.path = dest.substring(index+3);
-		if (this.path.isEmpty()) {
-			throw new IllegalArgumentException ("Destination path is missing in "+dest);
-		}
 	}
 
-	public String getProtocol() {
+	public String getScheme() {
 		return type;
 	}
 

@@ -12,11 +12,14 @@ class DestinationTest {
 		String path = "gkfsdjg-Sp_c/{d=yy}/photos-{d=dd-MM}";
 		String type = "dropbox";
 		Destination dest = new Destination(type+"://"+path);
-		assertEquals(type,dest.getProtocol());
+		assertEquals(type,dest.getScheme());
 		assertEquals(path,dest.getPath());
+
+		dest = new Destination("xxx://");
+		assertEquals("xxx",dest.getScheme());
+		assertEquals("",dest.getPath());
 
 		assertThrows(IllegalArgumentException.class, () -> new Destination(""));
 		assertThrows(IllegalArgumentException.class, () -> new Destination("gdfsjmlk"));
-		assertThrows(IllegalArgumentException.class, () -> new Destination("xxx://"));
 	}
 }

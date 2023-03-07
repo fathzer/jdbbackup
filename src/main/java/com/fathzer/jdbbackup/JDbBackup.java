@@ -77,7 +77,7 @@ public class JDbBackup {
 	}
 	
 	private <T> String backup(String dbURI, DestinationManager<T> manager, Destination destination, File tmpFile) throws IOException {
-		DBDumper dumper = getDBDumper(new Destination(dbURI).getProtocol());
+		DBDumper dumper = getDBDumper(new Destination(dbURI).getScheme());
 		T destFile = manager.validate(destination.getPath(), dumper.getExtensionBuilder());
 		dumper.save(dbURI, tmpFile);
 		try (InputStream in = new BufferedInputStream(new FileInputStream(tmpFile))) {
@@ -87,9 +87,9 @@ public class JDbBackup {
 	
 	protected <T> DestinationManager<T> getDestinationManager(Destination destination) {
 		@SuppressWarnings("unchecked")
-		final DestinationManager<T> manager = (DestinationManager<T>) MANAGERS.get(destination.getProtocol());
+		final DestinationManager<T> manager = (DestinationManager<T>) MANAGERS.get(destination.getScheme());
 		if (manager==null) {
-			throw new IllegalArgumentException("Unknown protocol: "+destination.getProtocol());
+			throw new IllegalArgumentException("Unknown protocol: "+destination.getScheme());
 		}
 		return manager;
 	}
